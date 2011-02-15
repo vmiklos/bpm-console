@@ -24,6 +24,15 @@ But the basics steps to get going are as follows:
 	See gui/war/README.txt for further information 
 
 
+Publish console artifacts
+------------------------------
+1) runing following commands for RiftSaw artifacts
+  mvn clean deploy -Dconsole.profile=riftsaw
+2) running following command for jBPM artifacts
+  mvn clean deploy -Dconsole.profile=jbpm
+
+
+
 Troubleshooting
 ---------------
 
