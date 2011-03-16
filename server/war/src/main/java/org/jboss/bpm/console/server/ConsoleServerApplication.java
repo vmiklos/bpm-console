@@ -46,6 +46,7 @@ public class ConsoleServerApplication extends Application
     singletons.add(new EngineFacade());
     singletons.add(new FormProcessingFacade());
     singletons.add(new ReportFacade() );
+    singletons.add(new BPAFServiceFacade());
   }
 
   @Override

@@ -113,4 +113,7 @@ public interface ConsoleIconBundle extends ClientBundle
 
     @ClientBundle.Source("grey.png")
     ImageResource greyIcon();
+    
+    @ClientBundle.Source("large.png")
+    ImageResource historySearchIcon();
 }
