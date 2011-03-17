@@ -97,7 +97,7 @@
             <groupId>org.jboss.bpm</groupId>
             <artifactId>activity-monitor-model</artifactId>
             <scope>provided</scope>
-            <version>1.0.0-Beta2</version>
+            <version>${activity.monitor.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.hibernate</groupId>
