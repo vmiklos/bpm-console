@@ -1,43 +1,45 @@
 /**
  * 
  */
-package org.jboss.bpm.console.client.monitor;
+package org.jboss.bpm.console.client.history;
 
 import java.util.Date;
 import java.util.List;
 
-import org.gwt.mosaic.ui.client.ScrollLayoutPanel;
+import org.gwt.mosaic.ui.client.DecoratedTabLayoutPanel;
 import org.gwt.mosaic.ui.client.ToolBar;
-import org.gwt.mosaic.ui.client.event.RowSelectionEvent;
-import org.gwt.mosaic.ui.client.event.RowSelectionHandler;
-import org.gwt.mosaic.ui.client.layout.BorderLayout;
 import org.gwt.mosaic.ui.client.layout.BoxLayout;
 import org.gwt.mosaic.ui.client.layout.BoxLayoutData;
 import org.gwt.mosaic.ui.client.layout.LayoutPanel;
 import org.gwt.mosaic.ui.client.layout.MosaicPanel;
-import org.gwt.mosaic.ui.client.list.DefaultListModel;
 import org.jboss.bpm.monitor.gui.client.HistoryRecords;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.workspaces.client.api.ProvisioningCallback;
 import org.jboss.errai.workspaces.client.api.WidgetProvider;
-import org.jboss.errai.workspaces.client.api.annotations.LoadTool;
+import org.jboss.errai.workspaces.client.framework.Registry;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
+import com.mvc4g.client.Controller;
+import com.mvc4g.client.Event;
+import com.mvc4g.client.ViewInterface;
 
 /**
  * @author Jeff Yu
  * @date: Mar 02, 2011
  */
-@LoadTool(name="History Query", group = "Processes", icon = "historySearchIcon", priority=1)
-public class HistorySearchView implements WidgetProvider {
+public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
+	
+	public static final String ID = ProcessHistorySearchView.class.getName();
+	
+	private Controller controller;
 	
 	private ListBox processStatusList;
 	
@@ -48,16 +50,31 @@ public class HistorySearchView implements WidgetProvider {
 	private DateBox startTime;
 	
 	private DateBox endTime;
-	
-	private org.gwt.mosaic.ui.client.ListBox<String> instancesList;
-	
+			
+	public ProcessHistorySearchView() {
+		this.controller = Registry.get(Controller.class);
+	}
 	
 	@Override
-	public void provideWidget(ProvisioningCallback callback) {
-		LayoutPanel panel = new LayoutPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL));
-		panel.setPadding(0);
-		panel.setWidgetSpacing(5);
+	public void provideWidget(final ProvisioningCallback callback) {		
+		MessageBuilder.createCall(new RemoteCallback<List<String>>(){					
+					@Override
+					public void callback(List<String> response) {
+						final LayoutPanel panel = new LayoutPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL));
+						panel.setPadding(0);
+						panel.setWidgetSpacing(5);
+						
+						initialize(panel, response);
+						
+						callback.onSuccess(panel);
+					}
+					
+				}, HistoryRecords.class).getProcessDefinitionKeys();
+				
 		
+	}
+
+	private void initialize(LayoutPanel panel, List<String> processDefinitions) {
 		final ToolBar toolbar = new ToolBar();
 		panel.add(toolbar, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
 		
@@ -67,36 +84,24 @@ public class HistorySearchView implements WidgetProvider {
 			public void onClick(ClickEvent clickEvent) {
 				String proDef = definitionList.getValue(definitionList.getSelectedIndex());
 				String theStatus = processStatusList.getValue(processStatusList.getSelectedIndex());
-				System.out.println(proDef);
-				System.out.println(theStatus);
 				Date theDate = startTime.getValue();
 				if (theDate == null) {
-					Date d = new Date(2003,1,1);
+					theDate = new Date(103,1,1);
 				}
-				
 				Date edate = endTime.getValue();
 				if (edate == null) {
 					edate = new Date();
 				}
 				String ckey = correlationKey.getValue();
 				
-				HistoryRecords rpcSvc = MessageBuilder.createCall(new RemoteCallback<List<String>>() {
-
-					@Override
-					public void callback(List<String> response) {
-						DefaultListModel<String> value = (DefaultListModel<String>)instancesList.getModel();
-						value.clear();
-						for (String s : response) {
-							value.add(s);
-						}
-						
-					}
-					
-				}, HistoryRecords.class);
-				System.out.println(rpcSvc);
-				System.out.println(theDate.getTime());
-				System.out.println(edate.getTime());
-				rpcSvc.getInstances(proDef, theStatus, theDate.getTime(), edate.getTime(), "Session=[1]");
+				ProcessSearchEvent event = new ProcessSearchEvent();
+				event.setDefinitionKey(proDef);
+				event.setStatus(theStatus);
+				event.setStartTime(theDate.getTime());
+				event.setEndTime(edate.getTime());
+				event.setKey(ckey);
+				
+				controller.handleEvent(new Event(LoadProcessHistoryAction.ID, event));
 			}
 			
 		}) );
@@ -105,78 +110,46 @@ public class HistorySearchView implements WidgetProvider {
 		panel.add(formPanel, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
 
 		BoxLayoutData bld1 = new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL);
-        bld1.setPreferredWidth("120px");
+        bld1.setPreferredWidth("130px");
         
         final MosaicPanel processDefBox = new MosaicPanel(new BoxLayout());
 		processDefBox.add(new Label("Process Definition: "), bld1);
 		
+		definitionList = new ListBox();
+		for (String s : processDefinitions) {
+			definitionList.addItem(s);
+		}
+		processDefBox.add(definitionList);
+				
         formPanel.add(processDefBox);       
         formPanel.add(createProcessStatusListBox(bld1));		
         formPanel.add(createCorrelationKeyTextBox(bld1));		
         formPanel.add(createStartTimeDateBox(bld1));        
         formPanel.add(createEndTimeDateBox(bld1));
+		
+		controller.addView(ID, this);
+		controller.addAction(LoadProcessHistoryAction.ID, new LoadProcessHistoryAction());
+		
+		ProcessHistoryInstanceListView listview = new ProcessHistoryInstanceListView();
+		final DecoratedTabLayoutPanel tabPanel = new DecoratedTabLayoutPanel(false);
+		listview.provideWidget(new ProvisioningCallback(){
 
-		populateProcessDefinitions(processDefBox);
+			@Override
+			public void onSuccess(Widget instance) {
+				tabPanel.add(instance, "History Instances");			
+			}
+
+			@Override
+			public void onUnavailable() {
 				
-		createProcessInstanceListBox(panel);
-		
-		callback.onSuccess(panel);
-	}
-
-
-	private void createProcessInstanceListBox(LayoutPanel panel) {
-		final LayoutPanel resultWindow = new LayoutPanel(new BorderLayout());		
-		panel.add(resultWindow, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
-		
-		final LayoutPanel resultLayout = new ScrollLayoutPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL));
-		resultWindow.add(resultLayout);
-		
-		instancesList = new org.gwt.mosaic.ui.client.ListBox<String>(new String[]{"Instance Id", "Correlation Key", "Status", "Start Time", "Finish Time"});
-		instancesList.setCellRenderer(new org.gwt.mosaic.ui.client.ListBox.CellRenderer<String>(){
-
-			@Override
-			public void renderCell(org.gwt.mosaic.ui.client.ListBox<String> listBox, int row, int column, String item) {
-				switch(column) {
-				case 0:
-					listBox.setWidget(row, column, new HTML(item));
-					break;
-				default:
-					throw new RuntimeException("Should not happen!");
-				}				
 			}
 			
 		});
 		
-		instancesList.addRowSelectionHandler(new RowSelectionHandler(){
-
-			@Override
-			public void onRowSelection(RowSelectionEvent event) {
-				int index = instancesList.getSelectedIndex();
-				System.out.println("The row selection index is: " + index);
-			}
-			
-		});
-		
-		resultLayout.add(instancesList, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
+		panel.add(tabPanel, new BoxLayoutData(BoxLayoutData.FillStyle.BOTH));
 	}
 
-
-	private void populateProcessDefinitions(final MosaicPanel processDefBox) {
-		MessageBuilder.createCall(new RemoteCallback<List<String>>(){
-			
-			@Override
-			public void callback(List<String> response) {
-				definitionList = new ListBox();
-				for (String s : response) {
-					definitionList.addItem(s);
-				}
-				processDefBox.add(definitionList);
-			}
-			
-		}, HistoryRecords.class).getProcessDefinitionKeys();
-	}
-
-
+	
 	private MosaicPanel createEndTimeDateBox(BoxLayoutData bld1) {
 		MosaicPanel box4 = new MosaicPanel(new BoxLayout());
 		endTime = new DateBox();
@@ -203,6 +176,7 @@ public class HistorySearchView implements WidgetProvider {
 		correlationKey.setWidth("550px");
 		box2.add(new Label("Correlation Key: "), bld1);
 		box2.add(correlationKey);
+		box2.add(new Label(" format: correlation name = [correlation value], e.g Session=[1]"));
 		return box2;
 	}
 
@@ -216,6 +190,12 @@ public class HistorySearchView implements WidgetProvider {
 		box1.add(new Label("Process Status: "), bld1);
 		box1.add(processStatusList);
 		return box1;
+	}
+
+
+	@Override
+	public void setController(Controller controller) {
+		this.controller = controller;
 	}
 
 }

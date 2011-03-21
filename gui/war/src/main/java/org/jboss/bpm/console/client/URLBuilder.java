@@ -242,6 +242,10 @@ public class URLBuilder
     {
         return config.getConsoleServerUrl() + "/rs/process/definition/history/" + definitionId;
     }
+    
+    public String getProcessHistoryURL(String querystring) {
+    	return config.getConsoleServerUrl()+"/rs/history/search?" + querystring;
+    }
 
     public String getDefinitionHistoryNodeInfoURL(String definitionId, List<String> activities)
     {

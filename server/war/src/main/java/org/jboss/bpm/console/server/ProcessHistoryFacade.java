@@ -3,6 +3,7 @@
  */
 package org.jboss.bpm.console.server;
 
+import java.net.URL;
 import java.util.List;
 
 import javax.ws.rs.GET;

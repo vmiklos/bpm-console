@@ -79,14 +79,14 @@ public class UpdateInstancesAction extends AbstractRESTAction
 
     ConsoleLog.info("Loaded " + instances.size() + " process instance(s) in "+(System.currentTimeMillis()-start)+" ms");
 
-    // refresh tasks
+/*    // refresh tasks
     MessageBuilder.createMessage()
         .toSubject(Model.SUBJECT)
         .command(ModelCommands.HAS_BEEN_UPDATED)
         .with(ModelParts.CLASS, Model.PROCESS_MODEL)
         .noErrorHandling()
         .sendNowWith(ErraiBus.get()
-        );
+        );*/
 
   }
 
