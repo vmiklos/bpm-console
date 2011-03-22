@@ -4,8 +4,12 @@
 package org.jboss.bpm.console.client.history;
 
 import java.util.List;
+import java.util.StringTokenizer;
 
+import org.gwt.mosaic.ui.client.DecoratedTabLayoutPanel;
 import org.gwt.mosaic.ui.client.ListBox;
+import org.gwt.mosaic.ui.client.ListBox.CellRenderer;
+import org.gwt.mosaic.ui.client.ScrollLayoutPanel;
 import org.gwt.mosaic.ui.client.event.RowSelectionEvent;
 import org.gwt.mosaic.ui.client.event.RowSelectionHandler;
 import org.gwt.mosaic.ui.client.layout.BoxLayout;
@@ -14,13 +18,24 @@ import org.gwt.mosaic.ui.client.layout.MosaicPanel;
 import org.gwt.mosaic.ui.client.list.DefaultListModel;
 import org.jboss.bpm.console.client.common.DataDriven;
 import org.jboss.bpm.console.client.common.LoadingOverlay;
+import org.jboss.bpm.console.client.common.WidgetWindowPanel;
 import org.jboss.bpm.console.client.model.HistoryProcessInstanceRef;
+import org.jboss.bpm.console.client.model.ProcessInstanceRef;
+import org.jboss.bpm.console.client.process.LoadInstanceActivityImage;
 import org.jboss.bpm.console.client.util.SimpleDateFormat;
+import org.jboss.bpm.monitor.gui.client.HistoryRecords;
+import org.jboss.errai.bus.client.api.RemoteCallback;
+import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.workspaces.client.api.ProvisioningCallback;
 import org.jboss.errai.workspaces.client.api.WidgetProvider;
 import org.jboss.errai.workspaces.client.framework.Registry;
 
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.mvc4g.client.Controller;
+import com.mvc4g.client.Event;
 import com.mvc4g.client.ViewInterface;
 
 /**
@@ -39,7 +54,11 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
 	
 	private ListBox<HistoryProcessInstanceRef> listbox;
 	
-	 private SimpleDateFormat dateFormat = new SimpleDateFormat();
+	private SimpleDateFormat dateFormat = new SimpleDateFormat();
+	
+	private WidgetWindowPanel processEventsWindow;
+		
+	private ListBox<String> processEvents;
 		
 	@Override
 	public void provideWidget(ProvisioningCallback callback) {
@@ -90,7 +109,7 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
 				int index = listbox.getSelectedIndex();
 				if (index != -1) {
 					HistoryProcessInstanceRef historyInstance = listbox.getItem(index);
-					//TODO: might need to use a pop-up window for the whole process events.
+					createHistoryInstanceDetailWindow(historyInstance.getProcessInstanceId());
 				}
 			}
 			
@@ -135,5 +154,72 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
 	public void setLoading(boolean isLoading) {
 		LoadingOverlay.on(instanceList, isLoading);
 	}
+	
+	
+	private void createHistoryInstanceDetailWindow(String processInstanceId) {
+		
+		org.gwt.mosaic.ui.client.layout.LayoutPanel layout = new ScrollLayoutPanel();
+        layout.setStyleName("bpm-window-layout");
+        layout.setPadding(5);
+
+        Label header = new Label("Instance: "+ processInstanceId);
+        header.setStyleName("bpm-label-header");
+        layout.add(header, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
+        
+        final DecoratedTabLayoutPanel tabPanel = new DecoratedTabLayoutPanel(false);
+        tabPanel.setPadding(5);
+        
+        processEvents = new ListBox<String>(new String[]{"Process Events"});
+        processEvents.setCellRenderer(new CellRenderer<String>(){
+
+			@Override
+			public void renderCell(ListBox<String> listBox, int row, int column, String item) {
+				switch(column) {
+				case 0:
+					listBox.setWidget(row, column, new HTML(item));
+					break;
+				default:
+					throw new RuntimeException("Should not happen!");
+				}				
+			}
+        });
+        
+        
+        MessageBuilder.createCall(new RemoteCallback<List<String>>(){
+			
+        	public void callback(List<String> list) {
+        		final DefaultListModel<String> model = (DefaultListModel<String>)processEvents.getModel();
+        		model.clear();
+        		for (String value : list) {
+        			model.add(formatResult(value));
+        		}
+        	}
+        	
+        }, HistoryRecords.class).getAllEvents(processInstanceId);
+        
+        MosaicPanel sourcePanel = new MosaicPanel();
+        sourcePanel.add(processEvents, new BoxLayoutData(BoxLayoutData.FillStyle.VERTICAL));        
+        tabPanel.add(sourcePanel, "Activity Events");
+        
+        tabPanel.selectTab(0);
+        
+        layout.add(tabPanel, new BoxLayoutData(BoxLayoutData.FillStyle.BOTH));
+        
+        processEventsWindow = new WidgetWindowPanel( "History Instance Activity", layout, true);
+        
+	}
+	
+    private String formatResult(String value) {
+    	StringBuffer sbuffer = new StringBuffer();
+    	StringTokenizer st = new StringTokenizer(value, "~");
+    	sbuffer.append(st.nextToken() + " : ");
+    	
+    	while (st.hasMoreTokens()) {
+    		sbuffer.append("<br/>");
+    		sbuffer.append(st.nextToken());
+    	}
+    	
+    	return sbuffer.toString();
+    }
 
 }
