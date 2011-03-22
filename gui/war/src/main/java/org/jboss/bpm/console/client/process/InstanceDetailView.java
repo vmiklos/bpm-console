@@ -186,13 +186,13 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
         header.setStyleName("bpm-label-header");
         layout.add(header, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
         
-        final TabLayoutPanel tabPanel = new DecoratedTabLayoutPanel(TabBarPosition.TOP);
+        final DecoratedTabLayoutPanel tabPanel = new DecoratedTabLayoutPanel(false);
         tabPanel.setPadding(5);
         
-        LayoutPanel diaViewLayout = new LayoutPanel();
-        diaViewLayout.add(diagramView);
+        MosaicPanel diaViewLayout = new MosaicPanel();
+        diaViewLayout.add(diagramView, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
         
-        tabPanel.add(diaViewLayout, "View");
+        tabPanel.add(diagramView, "View");
   
         processEvents = new ListBox<String>(new String[]{"Process Events"});
         processEvents.setCellRenderer(new CellRenderer<String>(){
@@ -210,9 +210,9 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
 			}
         });
         
-        LayoutPanel sourcePanel = new LayoutPanel();
-        sourcePanel.add(processEvents);        
-        tabPanel.add(processEvents, "Source");
+        MosaicPanel sourcePanel = new MosaicPanel();
+        sourcePanel.add(processEvents, new BoxLayoutData(BoxLayoutData.FillStyle.VERTICAL));        
+        tabPanel.add(sourcePanel, "Source");
         
         MessageBuilder.createCall(new RemoteCallback<List<String>>(){
 			
@@ -228,7 +228,7 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
         
         tabPanel.selectTab(0);
         
-        layout.add(tabPanel, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
+        layout.add(tabPanel, new BoxLayoutData(BoxLayoutData.FillStyle.BOTH));
 
         diagramWindowPanel = new WidgetWindowPanel(
                 "Process Instance Activity",

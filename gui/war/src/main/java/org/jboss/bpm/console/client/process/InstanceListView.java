@@ -489,7 +489,7 @@ public class InstanceListView implements WidgetProvider, ViewInterface, DataDriv
         List<ProcessInstanceRef> list = instances;//pagingPanel.trim(instances);
         for(ProcessInstanceRef inst : list)
         {
-            model.add(inst);
+        	model.add(inst);
         }
 
         // layout again
