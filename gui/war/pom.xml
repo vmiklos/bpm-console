@@ -737,6 +737,27 @@
                                             <overWrite>true</overWrite>
                                             <outputDirectory>war/app</outputDirectory>
                                             <includes>**/*</includes>
+											<excludes>**/app.html</excludes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>unpack-profile-riftsaw3</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.jboss.bpm</groupId>
+                                            <artifactId>gwt-console-profile-riftsaw</artifactId>
+                                            <version>${version}</version>
+                                            <type>jar</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>war</outputDirectory>
+                                            <includes>**/app.html</includes>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>

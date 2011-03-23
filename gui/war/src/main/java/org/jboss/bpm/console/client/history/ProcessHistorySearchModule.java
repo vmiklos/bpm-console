@@ -15,7 +15,7 @@ import com.google.gwt.core.client.RunAsyncCallback;
  * @author Jeff Yu
  * @date Mar 18, 2011
  */
-@LoadTool(name="History Query", group = "Processes", icon = "historySearchIcon", priority=1)
+@LoadTool(name="History Query", group = "Processes", icon = "historySearchIcon", priority= 3 )
 public class ProcessHistorySearchModule implements WidgetProvider {
 	
 	private ProcessHistorySearchView instance;
