@@ -30,6 +30,8 @@ import org.jboss.errai.workspaces.client.api.ProvisioningCallback;
 import org.jboss.errai.workspaces.client.api.WidgetProvider;
 import org.jboss.errai.workspaces.client.framework.Registry;
 
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.HTML;
@@ -102,10 +104,10 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
 			
 		});
 		
-		listbox.addRowSelectionHandler(new RowSelectionHandler(){
+		listbox.addDoubleClickHandler(new DoubleClickHandler(){
 
 			@Override
-			public void onRowSelection(RowSelectionEvent event) {
+			public void onDoubleClick(DoubleClickEvent event) {
 				int index = listbox.getSelectedIndex();
 				if (index != -1) {
 					HistoryProcessInstanceRef historyInstance = listbox.getItem(index);
