@@ -56,6 +56,7 @@
       <url-pattern>/rs/tasks/*</url-pattern>
       <url-pattern>/rs/identity/user/*</url-pattern>
       <url-pattern>/rs/identity/secure/*</url-pattern>
+      <url-pattern>/rs/history/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <role-name>administrator</role-name>
