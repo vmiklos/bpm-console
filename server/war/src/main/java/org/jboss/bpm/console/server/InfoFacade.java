@@ -105,7 +105,8 @@ public class InfoFacade
             TaskMgmtFacade.class,
             UserMgmtFacade.class,
             EngineFacade.class,
-            FormProcessingFacade.class
+            FormProcessingFacade.class,
+            ProcessHistoryFacade.class
             //,ReportFacade.class
         };
 
