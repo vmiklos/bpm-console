@@ -30,6 +30,7 @@ import org.jboss.bpm.console.server.integration.TaskManagement;
 import org.jboss.bpm.console.server.plugin.FormAuthorityRef;
 import org.jboss.bpm.console.server.plugin.FormDispatcherPlugin;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
+import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -55,7 +56,8 @@ import java.util.Map;
 @Path("form")
 @RsComment(
     title = "Form Processing",
-    description = "Web based form processing"
+    description = "Web based form processing",
+    project = {ProjectName.JBPM}
 )
 public class FormProcessingFacade
 {

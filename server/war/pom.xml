@@ -266,6 +266,49 @@
         </configuration>
       </plugin>
 
+
+      <plugin>
+         <artifactId>maven-antrun-plugin</artifactId>
+         <executions>
+          <execution>
+            <id>generate-docs</id>
+            <phase>prepare-package</phase>
+            <goals>
+                <goal>run</goal>
+            </goals>
+            <configuration>
+                <tasks>
+                    <java classname="org.jboss.bpm.console.server.util.RsDocGenerator">
+                        <arg value="${project.build.directory}/docs"/>
+                        <classpath>
+                            <pathelement path="${java.class.path}"/>
+                            <path refid="maven.compile.classpath"/>
+                        </classpath>
+                    </java>
+                </tasks>
+             </configuration>
+          </execution>
+         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>docs-package</id>
+            <phase>package</phase>
+            <configuration>
+              <classifier>docs</classifier>
+              <classesDirectory>${project.build.directory}/docs</classesDirectory>
+            </configuration>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
     
     <finalName>gwt-console-server</finalName>

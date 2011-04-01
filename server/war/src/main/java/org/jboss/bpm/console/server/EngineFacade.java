@@ -31,6 +31,7 @@ import org.jboss.bpm.console.client.model.JobRefWrapper;
 import org.jboss.bpm.console.server.gson.GsonFactory;
 import org.jboss.bpm.console.server.plugin.ProcessEnginePlugin;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
+import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
 
 import javax.ws.rs.*;
@@ -88,6 +89,7 @@ public class EngineFacade
   @POST
   @Path("deployment/{id}/suspend")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response suspendDeployment(
       @PathParam("id")
       String id
@@ -99,6 +101,7 @@ public class EngineFacade
   @POST
   @Path("deployment/{id}/resume")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response resumeDeployment(
       @PathParam("id")
       String id
@@ -125,6 +128,7 @@ public class EngineFacade
   @POST
   @Path("deployment/{id}/delete")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response deleteDeployment(
       @PathParam("id")
       String id
@@ -149,6 +153,7 @@ public class EngineFacade
   @GET
   @Path("jobs")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response getJobs()
   {
 
@@ -171,6 +176,7 @@ public class EngineFacade
   @POST
   @Path("job/{id}/execute")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response executeJob(
       @PathParam("id")
       String id

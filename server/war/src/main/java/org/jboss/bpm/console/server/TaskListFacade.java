@@ -32,6 +32,7 @@ import org.jboss.bpm.console.server.integration.TaskManagement;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
 import org.jboss.bpm.console.server.plugin.FormAuthorityRef;
 import org.jboss.bpm.console.server.plugin.FormDispatcherPlugin;
+import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
 
 import javax.ws.rs.GET;
@@ -50,7 +51,8 @@ import java.util.List;
 @Path("tasks")
 @RsComment(
     title = "Task Lists",
-    description = "Access task lists"
+    description = "Access task lists",
+    project = {ProjectName.JBPM}
 )
 public class TaskListFacade
 {

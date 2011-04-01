@@ -29,6 +29,7 @@ import org.jboss.bpm.console.client.model.RoleAssignmentRefWrapper;
 import org.jboss.bpm.console.server.gson.GsonFactory;
 import org.jboss.bpm.console.server.integration.ManagementFactory;
 import org.jboss.bpm.console.server.integration.UserManagement;
+import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +46,8 @@ import java.util.*;
 @Path("identity")
 @RsComment(
     title = "User management",
-    description = "Manage user and groups"
+    description = "Manage user and groups",
+    project = {ProjectName.JBPM}
 )
 public class UserMgmtFacade
 {

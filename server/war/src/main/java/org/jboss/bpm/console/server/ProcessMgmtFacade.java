@@ -30,6 +30,7 @@ import org.jboss.bpm.console.server.integration.ManagementFactory;
 import org.jboss.bpm.console.server.integration.ProcessManagement;
 import org.jboss.bpm.console.server.plugin.*;
 import org.jboss.bpm.console.server.util.Payload2XML;
+import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
 
 import javax.servlet.http.HttpServletRequest;
@@ -165,6 +166,7 @@ public class ProcessMgmtFacade
   @POST
   @Path("definition/{id}/remove")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response removeDefinitionsJSON(
       @PathParam("id")
       String definitionId
@@ -191,6 +193,7 @@ public class ProcessMgmtFacade
   @POST
   @Path("definition/{id}/new_instance")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response newInstance(
       @PathParam("id")
       String definitionId)
@@ -226,6 +229,7 @@ public class ProcessMgmtFacade
   @POST
   @Path("instance/{id}/state/{next}")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response changeState(
       @PathParam("id")
       String executionId,
@@ -256,6 +260,7 @@ public class ProcessMgmtFacade
   @POST
   @Path("instance/{id}/delete")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response deleteInstance(
       @PathParam("id")
       String executionId
@@ -269,6 +274,7 @@ public class ProcessMgmtFacade
   @POST
   @Path("tokens/{id}/transition")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response signalExecution(
       @PathParam("id")
       String id,
@@ -292,6 +298,7 @@ public class ProcessMgmtFacade
   @POST
   @Path("tokens/{id}/transition/default")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response signalExecutionDefault(
       @PathParam("id")
       String id)
@@ -362,6 +369,7 @@ public class ProcessMgmtFacade
   @GET
   @Path("instance/{id}/activeNodeInfo")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response getActiveNodeInfo(
       @PathParam("id")
       String id)
@@ -383,6 +391,7 @@ public class ProcessMgmtFacade
   @GET
   @Path("definition/history/{id}/nodeInfo")
   @Produces("application/json")
+  @RsComment(project = {ProjectName.JBPM})
   public Response getNodeInfoForActivities(
       @PathParam("id")
       String id, @QueryParam("activity") String[] activities)

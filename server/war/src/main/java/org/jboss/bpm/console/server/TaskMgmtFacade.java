@@ -27,6 +27,7 @@ import org.jboss.bpm.console.server.integration.ManagementFactory;
 import org.jboss.bpm.console.server.integration.TaskManagement;
 import org.jboss.bpm.console.server.plugin.FormDispatcherPlugin;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
+import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +43,8 @@ import javax.ws.rs.core.Response;
 @Path("task")
 @RsComment(
     title = "Task Management",
-    description = "Manage task instances"
+    description = "Manage task instances",
+    project = {ProjectName.JBPM}
 )
 public class TaskMgmtFacade
 {

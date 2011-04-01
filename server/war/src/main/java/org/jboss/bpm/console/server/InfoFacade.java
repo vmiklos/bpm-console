@@ -30,10 +30,10 @@ import org.jboss.bpm.console.server.util.RsDocBuilder;
 import org.jboss.bpm.console.server.util.RsComment;
 import org.jboss.bpm.console.client.model.ServerStatus;
 import org.jboss.bpm.console.client.model.PluginInfo;
-import org.jboss.bpm.report.ReportFacade;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Context;
@@ -65,7 +65,7 @@ public class InfoFacade
   @Produces("application/json")
   @RsComment(
       title = "Plugins",
-      description = "Plugin availablity"
+      description = "Plugin availability"
   )
   public Response getServerInfo()
   {
@@ -90,14 +90,37 @@ public class InfoFacade
   }
 
   @GET
-  @Path("resources")
+  @Path("resources/{project}")
   @Produces("text/html")
   public Response getPublishedUrls(
       @Context
-      HttpServletRequest request
+      HttpServletRequest request,
+      @PathParam("project")
+      String projectName
   )
   {
-    final Class[] rootResources = new Class[]
+    final Class[] rootResources = getRSResources();
+
+    String rsServer = request.getContextPath();
+    if (request.getServletPath() != null && !"".equals(request.getServletPath())) {
+    	rsServer = request.getContextPath() + request.getServletPath();
+    }
+    
+    RsDocBuilder rsDocBuilder = new RsDocBuilder(rsServer,rootResources);
+    StringBuffer sb = rsDocBuilder.build2HTML(projectName);
+    return Response.ok(sb.toString()).build();
+  }
+
+  private Response createJsonResponse(Object wrapper)
+  {
+    Gson gson = GsonFactory.createInstance();
+    String json = gson.toJson(wrapper);
+    return Response.ok(json).type("application/json").build();
+  }
+
+
+  public static Class[] getRSResources() {
+    return new Class[]
         {
             InfoFacade.class,
             ProcessMgmtFacade.class,
@@ -107,23 +130,6 @@ public class InfoFacade
             EngineFacade.class,
             FormProcessingFacade.class,
             ProcessHistoryFacade.class
-            //,ReportFacade.class
         };
-
-    String rsServer = request.getContextPath();
-    if (request.getServletPath() != null && !"".equals(request.getServletPath())) {
-    	rsServer = request.getContextPath() + request.getServletPath();
-    }
-    
-    RsDocBuilder rsDocBuilder = new RsDocBuilder(rsServer,rootResources);
-    StringBuffer sb = rsDocBuilder.build();
-    return Response.ok(sb.toString()).build();
-  }
-
-  private Response createJsonResponse(Object wrapper)
-  {
-    Gson gson = GsonFactory.createInstance();
-    String json = gson.toJson(wrapper);
-    return Response.ok(json).type("application/json").build();
   }
 }

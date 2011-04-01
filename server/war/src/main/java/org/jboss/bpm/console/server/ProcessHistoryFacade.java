@@ -20,6 +20,7 @@ import org.jboss.bpm.console.client.model.HistoryProcessInstanceRefWrapper;
 import org.jboss.bpm.console.server.gson.GsonFactory;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
 import org.jboss.bpm.console.server.plugin.ProcessHistoryPlugin;
+import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
 
 import com.google.gson.Gson;
@@ -32,7 +33,8 @@ import com.google.gson.Gson;
 @Path("/history")
 @RsComment(
     title = "Process History",
-    description = "Process History"
+    description = "Process History Service",
+    project = {ProjectName.RIFTSAW}
 )
 public class ProcessHistoryFacade {
 	
@@ -50,13 +52,19 @@ public class ProcessHistoryFacade {
 	@GET
 	@Produces("applications/json")
 	@Path("search")
+    @RsComment(example = "")
 	public Response findHisotryInstances(@Context UriInfo info) {
 		String dkey = info.getQueryParameters().getFirst("definitionkey");
 		String status = info.getQueryParameters().getFirst("status");
 		String stime = info.getQueryParameters().getFirst("starttime");
 		String etime = info.getQueryParameters().getFirst("endtime");
 		String ckey = info.getQueryParameters().getFirst("correlationkey");
-		
+
+        checkNotNull("definitionkey", dkey);
+        checkNotNull("status", status);
+        checkNotNull("starttime", stime);
+        checkNotNull("endtime", etime);
+
 		List<HistoryProcessInstanceRef> refs = getProcessHistoryPlugin().getHistoryProcessInstances(dkey, status, new Long(stime), new Long(etime), ckey);
 		HistoryProcessInstanceRefWrapper wrapper = new HistoryProcessInstanceRefWrapper(refs);
 		
@@ -68,6 +76,13 @@ public class ProcessHistoryFacade {
 	    String json = gson.toJson(wrapper);
 	    return Response.ok(json).type("application/json").build();
 	}
+
+
+    private void checkNotNull(String name, String value) {
+         if (null == value || "".equals(value.trim())) {
+             throw new NullPointerException(" " + name + " is null.");
+         }
+    }
 	
 	
 }
