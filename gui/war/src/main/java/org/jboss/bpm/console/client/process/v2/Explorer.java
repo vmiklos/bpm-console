@@ -147,7 +147,7 @@ public class Explorer implements WidgetProvider, DataDriven, ViewInterface {
                     MessageBuilder.createMessage()
                             .toSubject(Workspace.SUBJECT)
                             .command(LayoutCommands.ActivateTool)
-                            .with(LayoutParts.TOOL, "Execution_History.1")
+                            .with(LayoutParts.TOOL, "Execution_History.2")
                             .with(LayoutParts.TOOLSET, "ToolSet_Processes")
                             .noErrorHandling()
                             .sendNowWith(ErraiBus.get());
