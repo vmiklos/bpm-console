@@ -247,6 +247,53 @@ public class URLBuilder
     	return config.getConsoleServerUrl()+"/rs/history/search?" + querystring;
     }
 
+    public String getProcessHistoryDefinitionsURL() {
+        return config.getConsoleServerUrl() + "/rs/history/definitions";
+    }
+
+    public String getProcessHistoryInstancesURL(String id) {
+        String encodedId = URL.encode(id);
+        return config.getConsoleServerUrl() + "/rs/history/definition/" + encodedId + "/instances";
+    }
+
+    public String getProcessHistoryActivityKeysURL(String instanceId) {
+        return config.getConsoleServerUrl() + "/rs/history/instance/" + instanceId + "/activities";
+    }
+
+    public String getProcessHistoryEventsURL(String instanceId) {
+        return config.getConsoleServerUrl() + "/rs/history/instance/" + instanceId + "/events";
+    }
+
+    public String getProcessHistoryCompletedInstancesURL(String id, String timestamp, String timespan) {
+        String encodedId = URL.encode(id);
+        return config.getConsoleServerUrl() + "/rs/history/definition/" + encodedId + "/instances/completed?timestamp="
+                                  + timestamp + "&timespan=" + timespan;
+    }
+
+    public String getProcessHistoryFailedInstanceURL(String id, String timestamp, String timespan) {
+        String encodedId = URL.encode(id);
+        return config.getConsoleServerUrl() + "/rs/history/definition/" + encodedId + "/instances/failed?timestamp="
+                                  + timestamp + "&timespan=" + timespan;
+    }
+
+    public String getProcessHistoryTerminatedInstanceURL(String id, String timestamp, String timespan) {
+        String encodedId = URL.encode(id);
+        return config.getConsoleServerUrl() + "/rs/history/definition/" + encodedId + "/instances/terminated?timestamp="
+                                  + timestamp + "&timespan=" + timespan;
+    }
+
+
+    public String getProcessHistoryCompletedInstances4ChartURL(String id, String timespan) {
+        String encodedId = URL.encode(id);
+        return config.getConsoleServerUrl() + "/rs/history/definition/" + encodedId + "/instances/chart/completed?timespan="+timespan;
+    }
+
+
+    public String getProcessHistoryFailedInstances4ChartURL(String id, String timespan) {
+        String encodedId = URL.encode(id);
+        return config.getConsoleServerUrl() + "/rs/history/definition/" + encodedId + "/instances/chart/failed?timespan="+timespan;
+    }
+
     public String getDefinitionHistoryNodeInfoURL(String definitionId, List<String> activities)
     {
         StringBuffer queryString = new StringBuffer();
