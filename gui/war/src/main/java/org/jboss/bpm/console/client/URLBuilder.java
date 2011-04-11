@@ -63,6 +63,8 @@ public class URLBuilder
     public String getProcessInstancesURL(String processId)
     {
         String encodedId = URL.encode(processId);
+        System.out.println("the decoded Id is: " + processId);
+        System.out.println("the encoded Id is: " + encodedId);
         return config.getConsoleServerUrl() + "/rs/process/definition/" + encodedId + "/instances";
     }
 
@@ -243,8 +245,9 @@ public class URLBuilder
         return config.getConsoleServerUrl() + "/rs/process/definition/history/" + definitionId;
     }
     
-    public String getProcessHistoryURL(String querystring) {
-    	return config.getConsoleServerUrl()+"/rs/history/search?" + querystring;
+    public String getProcessHistoryURL(String definitionId, String querystring) {
+        String encodedId = URL.encode(definitionId);
+    	return config.getConsoleServerUrl()+"/rs/history/definition/"+ encodedId + "/instances?" + querystring;
     }
 
     public String getProcessHistoryDefinitionsURL() {
@@ -308,5 +311,10 @@ public class URLBuilder
         }
 
         return config.getConsoleServerUrl() + "/rs/process/definition/history/" + definitionId + "/nodeInfo?" + queryString.toString();
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(URL.encode("{http://www.jboss.org/bpel/examples}HelloGoodbye-1"));
     }
 }

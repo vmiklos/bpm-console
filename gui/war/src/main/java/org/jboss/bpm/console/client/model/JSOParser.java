@@ -63,7 +63,7 @@ public class JSOParser
     def.setPackageName(rootModel.get("packageName", ""));
     def.setFormUrl(rootModel.get("formUrl", null));
     def.setDiagramUrl(rootModel.get("diagramUrl", null));
-    
+
     return def;
   }
 

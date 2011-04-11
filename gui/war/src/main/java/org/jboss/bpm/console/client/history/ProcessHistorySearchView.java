@@ -12,6 +12,7 @@ import org.gwt.mosaic.ui.client.layout.BoxLayout;
 import org.gwt.mosaic.ui.client.layout.BoxLayoutData;
 import org.gwt.mosaic.ui.client.layout.LayoutPanel;
 import org.gwt.mosaic.ui.client.layout.MosaicPanel;
+import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
 import org.jboss.bpm.monitor.gui.client.HistoryRecords;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
@@ -50,31 +51,33 @@ public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
 	private DateBox startTime;
 	
 	private DateBox endTime;
+
+    private ProvisioningCallback callback;
 			
 	public ProcessHistorySearchView() {
 		this.controller = Registry.get(Controller.class);
+
+        this.controller.addView(ID, this);
+		this.controller.addAction(LoadProcessHistoryAction.ID, new LoadProcessHistoryAction());
+        this.controller.addAction(LoadProcessDefinitionsAction.ID, new LoadProcessDefinitionsAction());
+
 	}
 	
 	@Override
-	public void provideWidget(final ProvisioningCallback callback) {		
-		MessageBuilder.createCall(new RemoteCallback<List<String>>(){					
-					@Override
-					public void callback(List<String> response) {
-						final LayoutPanel panel = new LayoutPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL));
-						panel.setPadding(0);
-						panel.setWidgetSpacing(5);
-						
-						initialize(panel, response);
-						
-						callback.onSuccess(panel);
-					}
-					
-				}, HistoryRecords.class).getProcessDefinitionKeys();
-				
+	public void provideWidget(final ProvisioningCallback callback) {
+
+        controller.handleEvent(new Event(LoadProcessDefinitionsAction.ID, null));
+
+		this.callback = callback;
 		
 	}
 
-	private void initialize(LayoutPanel panel, List<String> processDefinitions) {
+	public void initialize(final List<ProcessDefinitionRef> processDefinitions) {
+
+		final LayoutPanel panel = new LayoutPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL));
+		panel.setPadding(0);
+		panel.setWidgetSpacing(5);
+
 		final ToolBar toolbar = new ToolBar();
 		panel.add(toolbar, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
 		
@@ -83,6 +86,15 @@ public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
 			@Override
 			public void onClick(ClickEvent clickEvent) {
 				String proDef = definitionList.getValue(definitionList.getSelectedIndex());
+
+                String definitionId = null;
+
+                for (ProcessDefinitionRef ref : processDefinitions) {
+                    if (proDef.equals(ref.getName())) {
+                        definitionId = ref.getId();
+                    }
+                }
+
 				String theStatus = processStatusList.getValue(processStatusList.getSelectedIndex());
 				Date theDate = startTime.getValue();
 				if (theDate == null) {
@@ -95,7 +107,7 @@ public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
 				String ckey = correlationKey.getValue();
 				
 				ProcessSearchEvent event = new ProcessSearchEvent();
-				event.setDefinitionKey(proDef);
+				event.setDefinitionKey(definitionId);
 				event.setStatus(theStatus);
 				event.setStartTime(theDate.getTime());
 				event.setEndTime(edate.getTime());
@@ -116,8 +128,8 @@ public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
 		processDefBox.add(new Label("Process Definition: "), bld1);
 		
 		definitionList = new ListBox();
-		for (String s : processDefinitions) {
-			definitionList.addItem(s);
+		for (ProcessDefinitionRef ref : processDefinitions) {
+			definitionList.addItem(ref.getName());
 		}
 		processDefBox.add(definitionList);
 				
@@ -126,9 +138,7 @@ public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
         formPanel.add(createCorrelationKeyTextBox(bld1));		
         formPanel.add(createStartTimeDateBox(bld1));        
         formPanel.add(createEndTimeDateBox(bld1));
-		
-		controller.addView(ID, this);
-		controller.addAction(LoadProcessHistoryAction.ID, new LoadProcessHistoryAction());
+
 		
 		ProcessHistoryInstanceListView listview = new ProcessHistoryInstanceListView();
 		final DecoratedTabLayoutPanel tabPanel = new DecoratedTabLayoutPanel(false);
@@ -147,6 +157,8 @@ public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
 		});
 		
 		panel.add(tabPanel, new BoxLayoutData(BoxLayoutData.FillStyle.BOTH));
+
+        callback.onSuccess(panel);
 	}
 
 	

@@ -17,6 +17,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.bpm.console.client.model.HistoryProcessInstanceRef;
 import org.jboss.bpm.console.client.model.HistoryProcessInstanceRefWrapper;
+import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
+import org.jboss.bpm.console.client.model.ProcessDefinitionRefWrapper;
 import org.jboss.bpm.console.server.gson.GsonFactory;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
 import org.jboss.bpm.console.server.plugin.ProcessHistoryPlugin;
@@ -51,21 +53,19 @@ public class ProcessHistoryFacade {
 	
 	@GET
 	@Produces("applications/json")
-	@Path("search")
-    @RsComment(example = "")
-	public Response findHisotryInstances(@Context UriInfo info) {
-		String dkey = info.getQueryParameters().getFirst("definitionkey");
+	@Path("definition/{id}/instances")
+	public Response findHisotryInstances(@PathParam("id") String id, @Context UriInfo info) {
 		String status = info.getQueryParameters().getFirst("status");
 		String stime = info.getQueryParameters().getFirst("starttime");
 		String etime = info.getQueryParameters().getFirst("endtime");
 		String ckey = info.getQueryParameters().getFirst("correlationkey");
 
-        checkNotNull("definitionkey", dkey);
+        checkNotNull("definitionkey", id);
         checkNotNull("status", status);
         checkNotNull("starttime", stime);
         checkNotNull("endtime", etime);
 
-		List<HistoryProcessInstanceRef> refs = getProcessHistoryPlugin().getHistoryProcessInstances(dkey, status, new Long(stime), new Long(etime), ckey);
+		List<HistoryProcessInstanceRef> refs = getProcessHistoryPlugin().getHistoryProcessInstances(id, status, new Long(stime), new Long(etime), ckey);
 		HistoryProcessInstanceRefWrapper wrapper = new HistoryProcessInstanceRefWrapper(refs);
 		
 		return createJsonResponse(wrapper);
@@ -76,8 +76,9 @@ public class ProcessHistoryFacade {
     @Produces("application/json")
     @Path("definitions")
     public Response getProcessDefinitionKeys() {
-        List<String> keys = getProcessHistoryPlugin().getProcessDefinitionKeys();
-        return createJsonResponse(keys);
+        List<ProcessDefinitionRef> keys = getProcessHistoryPlugin().getProcessDefinitions();
+        ProcessDefinitionRefWrapper wrapper = new ProcessDefinitionRefWrapper(keys);
+        return createJsonResponse(wrapper);
     }
 
 

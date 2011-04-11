@@ -41,9 +41,7 @@ public class LoadProcessHistoryAction extends AbstractRESTAction {
 	public String getUrl(Object event) {
 		ProcessSearchEvent searchEvent = (ProcessSearchEvent) event;
 		StringBuffer sbuffer = new StringBuffer();
-		sbuffer.append("definitionkey=");
-		sbuffer.append(URL.encode(searchEvent.getDefinitionKey()));
-		sbuffer.append("&status=");
+		sbuffer.append("status=");
 		sbuffer.append(searchEvent.getStatus());
 		sbuffer.append("&starttime=");
 		sbuffer.append(searchEvent.getStartTime());
@@ -53,7 +51,7 @@ public class LoadProcessHistoryAction extends AbstractRESTAction {
 			sbuffer.append("&correlationkey=");
 			sbuffer.append(URL.encode(searchEvent.getKey().replace("=", "~")));
 		}
-		return URLBuilder.getInstance().getProcessHistoryURL(sbuffer.toString());
+		return URLBuilder.getInstance().getProcessHistoryURL(searchEvent.getDefinitionKey(), sbuffer.toString());
 	}
 
 	
