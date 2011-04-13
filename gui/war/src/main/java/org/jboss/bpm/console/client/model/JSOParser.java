@@ -25,9 +25,7 @@ import com.google.gwt.core.client.JsArray;
 import org.jboss.bpm.report.model.ReportParameter;
 import org.jboss.bpm.report.model.ReportReference;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Heiko.Braun <heiko.braun@jboss.com>
@@ -208,6 +206,21 @@ public class JSOParser
 
     return status;
   }
+
+
+  public static List<StringRef> parseStringRef(String json) {
+      List<StringRef> refs = new LinkedList<StringRef>();
+
+      JSOModel rootModel = JSOModel.fromJson(json);
+      JsArray<JSOModel> values = rootModel.getArray("values");
+
+      for (int i=0; i<values.length(); i++) {
+          JSOModel entry = values.get(i);
+          StringRef ref = new StringRef(entry.get("value"));
+          refs.add(ref);
+      }
+      return refs;
+  }
   
   public static List<HistoryActivityInstanceRef> parseProcessInstanceHistory(String json)
   {
@@ -225,6 +238,7 @@ public class JSOParser
 
     return results;
   }
+
   
   public static HistoryActivityInstanceRef parseProcessInstanceHistory(JSOModel rootModel)
   {

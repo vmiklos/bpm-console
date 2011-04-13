@@ -4,6 +4,8 @@
 package org.jboss.bpm.console.server;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -15,10 +17,7 @@ import javax.ws.rs.core.UriInfo;
 import com.sun.jdi.LongType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.bpm.console.client.model.HistoryProcessInstanceRef;
-import org.jboss.bpm.console.client.model.HistoryProcessInstanceRefWrapper;
-import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
-import org.jboss.bpm.console.client.model.ProcessDefinitionRefWrapper;
+import org.jboss.bpm.console.client.model.*;
 import org.jboss.bpm.console.server.gson.GsonFactory;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
 import org.jboss.bpm.console.server.plugin.ProcessHistoryPlugin;
@@ -87,8 +86,14 @@ public class ProcessHistoryFacade {
     @Path("definition/{id}/instances")
     public Response getProcessInstanceKeys(@PathParam("id") String definitionId) {
         checkNotNull("definitionId", definitionId);
-        List<String> instanceIds = getProcessHistoryPlugin().getProcessInstanceKeys(definitionId);
-        return createJsonResponse(instanceIds);
+        List<String> instances = getProcessHistoryPlugin().getProcessInstanceKeys(definitionId);
+        List<StringRef> result = new ArrayList<StringRef>();
+        for (String s: instances) {
+            StringRef ref = new StringRef(s);
+            result.add(ref);
+        }
+
+        return createJsonResponse(new StringRefWrapper(result));
     }
 
     @GET
@@ -107,7 +112,14 @@ public class ProcessHistoryFacade {
     public Response getAllEvents(@PathParam("id") String instanceId) {
         checkNotNull("instanceId", instanceId);
         List<String> events = getProcessHistoryPlugin().getAllEvents(instanceId);
-        return createJsonResponse(events);
+
+        List<StringRef> result = new LinkedList<StringRef>();
+        for (String s: events) {
+            StringRef ref = new StringRef(s);
+            result.add(ref);
+        }
+
+        return createJsonResponse(new StringRefWrapper(result));
     }
 
     @GET
@@ -120,10 +132,16 @@ public class ProcessHistoryFacade {
         checkNotNull("timestamp", timestamp);
         checkNotNull("timespan", timespan);
 
-        Set<String> instanceIds = getProcessHistoryPlugin().getCompletedInstances(definitionId,
+        Set<String> instances = getProcessHistoryPlugin().getCompletedInstances(definitionId,
                 new Long(timestamp).longValue(), timespan);
 
-        return createJsonResponse(instanceIds);
+        List<StringRef> result = new ArrayList<StringRef>();
+        for (String s: instances) {
+            StringRef ref = new StringRef(s);
+            result.add(ref);
+        }
+
+        return createJsonResponse(new StringRefWrapper(result));
     }
 
     @GET
@@ -137,10 +155,16 @@ public class ProcessHistoryFacade {
         checkNotNull("timestamp", timestamp);
         checkNotNull("timespan", timespan);
 
-        Set<String> instanceIds = getProcessHistoryPlugin().getFailedInstances(definitionId,
+        Set<String> instances = getProcessHistoryPlugin().getFailedInstances(definitionId,
                                     new Long(timestamp).longValue(), timespan);
 
-        return createJsonResponse(instanceIds);
+        List<StringRef> result = new ArrayList<StringRef>();
+        for (String s: instances) {
+            StringRef ref = new StringRef(s);
+            result.add(ref);
+        }
+
+        return createJsonResponse(new StringRefWrapper(result));
     }
 
 
@@ -155,10 +179,16 @@ public class ProcessHistoryFacade {
         checkNotNull("timestamp", timestamp);
         checkNotNull("timespan", timespan);
 
-        Set<String> instanceIds = getProcessHistoryPlugin().getTerminatedInstances(definitionId,
+        Set<String> instances = getProcessHistoryPlugin().getTerminatedInstances(definitionId,
                                     new Long(timestamp).longValue(), timespan);
 
-        return createJsonResponse(instanceIds);
+        List<StringRef> result = new ArrayList<StringRef>();
+        for (String s: instances) {
+            StringRef ref = new StringRef(s);
+            result.add(ref);
+        }
+
+        return createJsonResponse(new StringRefWrapper(result));
     }
 
 
@@ -170,7 +200,7 @@ public class ProcessHistoryFacade {
         checkNotNull("definitionId", definitionId);
         checkNotNull("timespan", timespan);
         String result = getProcessHistoryPlugin().getCompletedInstances4Chart(definitionId, timespan);
-        return createJsonResponse(result);
+        return Response.ok(result).type("application/json").build();
     }
 
     @GET
@@ -181,7 +211,7 @@ public class ProcessHistoryFacade {
         checkNotNull("definitionId", definitionId);
         checkNotNull("timespan", timespan);
         String result = getProcessHistoryPlugin().getFailedInstances4Chart(definitionId, timespan);
-        return createJsonResponse(result);
+        return Response.ok(result).type("application/json").build();
     }
 
 

@@ -21,34 +21,6 @@
  */
 package org.jboss.bpm.console.client.process;
 
-import java.util.List;
-import java.util.StringTokenizer;
-
-import org.gwt.mosaic.ui.client.CaptionLayoutPanel;
-import org.gwt.mosaic.ui.client.DecoratedTabLayoutPanel;
-import org.gwt.mosaic.ui.client.ListBox;
-import org.gwt.mosaic.ui.client.ListBox.CellRenderer;
-import org.gwt.mosaic.ui.client.MessageBox;
-import org.gwt.mosaic.ui.client.ScrollLayoutPanel;
-import org.gwt.mosaic.ui.client.TabLayoutPanel;
-import org.gwt.mosaic.ui.client.TabLayoutPanel.TabBarPosition;
-import org.gwt.mosaic.ui.client.layout.BoxLayout;
-import org.gwt.mosaic.ui.client.layout.BoxLayoutData;
-import org.gwt.mosaic.ui.client.layout.LayoutPanel;
-import org.gwt.mosaic.ui.client.layout.MosaicPanel;
-import org.gwt.mosaic.ui.client.list.DefaultListModel;
-import org.jboss.bpm.console.client.ApplicationContext;
-import org.jboss.bpm.console.client.ServerPlugins;
-import org.jboss.bpm.console.client.common.PropertyGrid;
-import org.jboss.bpm.console.client.common.WidgetWindowPanel;
-import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
-import org.jboss.bpm.console.client.model.ProcessInstanceRef;
-import org.jboss.bpm.console.client.util.SimpleDateFormat;
-import org.jboss.bpm.monitor.gui.client.HistoryRecords;
-import org.jboss.errai.bus.client.api.RemoteCallback;
-import org.jboss.errai.bus.client.api.base.MessageBuilder;
-import org.jboss.errai.workspaces.client.framework.Registry;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -59,6 +31,24 @@ import com.google.gwt.user.client.ui.Label;
 import com.mvc4g.client.Controller;
 import com.mvc4g.client.Event;
 import com.mvc4g.client.ViewInterface;
+import org.gwt.mosaic.ui.client.*;
+import org.gwt.mosaic.ui.client.ListBox.CellRenderer;
+import org.gwt.mosaic.ui.client.layout.BoxLayout;
+import org.gwt.mosaic.ui.client.layout.BoxLayoutData;
+import org.gwt.mosaic.ui.client.layout.MosaicPanel;
+import org.gwt.mosaic.ui.client.list.DefaultListModel;
+import org.jboss.bpm.console.client.ApplicationContext;
+import org.jboss.bpm.console.client.ServerPlugins;
+import org.jboss.bpm.console.client.common.PropertyGrid;
+import org.jboss.bpm.console.client.common.WidgetWindowPanel;
+import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
+import org.jboss.bpm.console.client.model.ProcessInstanceRef;
+import org.jboss.bpm.console.client.model.StringRef;
+import org.jboss.bpm.console.client.util.SimpleDateFormat;
+import org.jboss.errai.workspaces.client.framework.Registry;
+
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author Heiko.Braun <heiko.braun@jboss.com>
@@ -99,6 +89,12 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
     public InstanceDetailView()
     {
         super("Execution details");
+
+        controller = Registry.get(Controller.class);
+
+        controller.addView(ID, this);
+        controller.addAction(GetProcessInstanceEventsAction.ID, new GetProcessInstanceEventsAction());
+
 
         this.appContext = Registry.get(ApplicationContext.class);
         isRiftsawInstance = appContext.getConfig().getProfileName().equals("BPEL Console");
@@ -214,18 +210,6 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
         sourcePanel.add(processEvents, new BoxLayoutData(BoxLayoutData.FillStyle.VERTICAL));        
         tabPanel.add(sourcePanel, "Source");
         
-        MessageBuilder.createCall(new RemoteCallback<List<String>>(){
-			
-        	public void callback(List<String> list) {
-        		final DefaultListModel<String> model = (DefaultListModel<String>)processEvents.getModel();
-        		model.clear();
-        		for (String value : list) {
-        			model.add(formatResult(value));
-        		}
-        	}
-        	
-        }, HistoryRecords.class).getAllEvents(inst.getId());
-        
         tabPanel.selectTab(0);
         
         layout.add(tabPanel, new BoxLayoutData(BoxLayoutData.FillStyle.BOTH));
@@ -234,6 +218,17 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
                 "Process Instance Activity",
                 layout, true
         );
+
+        controller.handleEvent(new Event(GetProcessInstanceEventsAction.ID, inst.getId()));
+    }
+
+
+    public void populateProcessInstanceEvents(List<StringRef> refs) {
+        final DefaultListModel<String> model = (DefaultListModel<String>)processEvents.getModel();
+        model.clear();
+        for (StringRef value : refs) {
+            model.add(formatResult(value.getValue()));
+        }
     }
     
     private String formatResult(String value) {

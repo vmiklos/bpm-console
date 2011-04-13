@@ -25,6 +25,9 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.mvc4g.client.Controller;
+import com.mvc4g.client.Event;
+import com.mvc4g.client.ViewInterface;
 import org.gwt.mosaic.ui.client.LayoutPopupPanel;
 import org.gwt.mosaic.ui.client.PopupMenu;
 import org.gwt.mosaic.ui.client.ToolBar;
@@ -34,17 +37,20 @@ import org.gwt.mosaic.ui.client.list.DefaultListModel;
 import org.gwt.mosaic.ui.client.util.ResizableWidget;
 import org.gwt.mosaic.ui.client.util.ResizableWidgetCollection;
 import org.jboss.bpm.console.client.common.LoadingOverlay;
+import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
+import org.jboss.bpm.console.client.model.StringRef;
 import org.jboss.bpm.console.client.util.ConsoleLog;
 import org.jboss.bpm.console.client.util.SimpleDateFormat;
-import org.jboss.bpm.monitor.gui.client.*;
+import org.jboss.bpm.monitor.gui.client.ChronoscopeFactory;
+import org.jboss.bpm.monitor.gui.client.JSOModel;
+import org.jboss.bpm.monitor.gui.client.TimespanValues;
 import org.jboss.errai.bus.client.ErraiBus;
 import org.jboss.errai.bus.client.api.Message;
 import org.jboss.errai.bus.client.api.MessageCallback;
-import org.jboss.errai.bus.client.api.RemoteCallback;
-import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.workspaces.client.api.ProvisioningCallback;
 import org.jboss.errai.workspaces.client.api.WidgetProvider;
 import org.jboss.errai.workspaces.client.api.annotations.LoadTool;
+import org.jboss.errai.workspaces.client.framework.Registry;
 import org.timepedia.chronoscope.client.Dataset;
 import org.timepedia.chronoscope.client.Datasets;
 import org.timepedia.chronoscope.client.Overlay;
@@ -60,15 +66,21 @@ import org.timepedia.chronoscope.client.event.PlotFocusHandler;
 import org.timepedia.chronoscope.client.io.DatasetReader;
 import org.timepedia.chronoscope.client.util.date.ChronoDate;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Heiko Braun <hbraun@redhat.com>
+ * @author: Jeff Yu <cyu@redhat.com>
  * @date: Mar 11, 2010
  */                                                                                                          
 @LoadTool(name="Execution History", group = "Processes")
-public class ExecutionHistoryView implements WidgetProvider
+public class ExecutionHistoryView implements WidgetProvider, ViewInterface
 {
+
+    public static final String ID = ExecutionHistoryView.class.getName();
 
     private static final String TIMEPEDIA_FONTBOOK_SERVICE = "http://api.timepedia.org/fr";
 
@@ -93,12 +105,23 @@ public class ExecutionHistoryView implements WidgetProvider
     private LayoutPanel buttonPanel;
     private CheckBox includeFailed;
 
+    private Controller controller;
+
     private final static int DATASET_COMPLETED = 0;
     private final static int DATASET_FAILED = 1;
     private final static int DATASET_TERMINATED = 2;
+
+    private List<ProcessDefinitionRef> processDefinitions;
     
     public void provideWidget(ProvisioningCallback callback)
     {
+
+        this.controller = Registry.get(Controller.class);
+
+        controller.addView(ID, this);
+        controller.addAction(GetProcessDefinitionsAction.ID, new GetProcessDefinitionsAction());
+        controller.addAction(LoadDatasetsAction.ID, new LoadDatasetsAction());
+        controller.addAction(LoadChartProcessInstancesAction.ID, new LoadChartProcessInstancesAction());
 
         LayoutPanel panel = new LayoutPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL));
                 
@@ -110,7 +133,7 @@ public class ExecutionHistoryView implements WidgetProvider
         menuButton = new ToolButton("Open", new ClickHandler()
         {
             public void onClick(ClickEvent clickEvent) {
-                selectDefinition();
+                controller.handleEvent(new Event(GetProcessDefinitionsAction.ID, null));
             }
         });        
         toolBar.add(menuButton);
@@ -143,7 +166,20 @@ public class ExecutionHistoryView implements WidgetProvider
             {
                 public void execute()
                 {
-                    loadDatasets(currentProcDef, ts);
+
+                    LoadingOverlay.on(chartArea, true);
+
+                    LoadDatasetEvent theEvent = new LoadDatasetEvent();
+                    theEvent.setDefinitionId(getDefinitionId(currentProcDef));
+                    theEvent.setTimespan(ts);
+                    currentTimespan = ts;
+                    if (includeFailed.getValue()) {
+                        theEvent.setIncludedFailed(true);
+                    } else {
+                        theEvent.setIncludedFailed(false);
+                    }
+
+                    controller.handleEvent(new Event(LoadDatasetsAction.ID, theEvent));
                 }
             });
         };
@@ -180,8 +216,19 @@ public class ExecutionHistoryView implements WidgetProvider
         includeFailed.setValue(false);
         includeFailed.addValueChangeHandler(new ValueChangeHandler<Boolean>()
         {
-            public void onValueChange(ValueChangeEvent<Boolean> isEnabled) {                
-                loadDatasets(currentProcDef, currentTimespan);
+            public void onValueChange(ValueChangeEvent<Boolean> isEnabled) {
+
+                LoadingOverlay.on(chartArea, true);
+
+                LoadDatasetEvent theEvent = new LoadDatasetEvent();
+                theEvent.setDefinitionId(getDefinitionId(currentProcDef));
+                theEvent.setTimespan(currentTimespan);
+                if (includeFailed.getValue()) {
+                    theEvent.setIncludedFailed(true);
+                } else {
+                    theEvent.setIncludedFailed(false);
+                }
+                controller.handleEvent(new Event(LoadDatasetsAction.ID, theEvent));
             }
         });
 
@@ -196,7 +243,8 @@ public class ExecutionHistoryView implements WidgetProvider
             public void callback(Message message) {
 
                 String processName = message.get(String.class, "processName");
-                update(processName);
+                String processDefinitionId = message.get(String.class, "processDefinitionId");
+                update(processName, processDefinitionId);
 
             }
         });
@@ -205,74 +253,79 @@ public class ExecutionHistoryView implements WidgetProvider
     }
 
 
-    private void selectDefinition()
+    private String getDefinitionId(String currentProcessDefinition) {
+        String definitionId = null;
+
+        for (ProcessDefinitionRef ref : processDefinitions) {
+            if (currentProcessDefinition.equals(ref.getName())) {
+                definitionId = ref.getId();
+            }
+        }
+
+        return definitionId;
+    }
+
+
+    public void selectDefinition(List<ProcessDefinitionRef> processDefinitions)
     {
-        HistoryRecords rpcService = MessageBuilder.createCall(
-                new RemoteCallback<List<String>>()
+
+        this.processDefinitions = processDefinitions;
+
+        final LayoutPopupPanel popup = new LayoutPopupPanel(true);
+        popup.addStyleName("soa-PopupPanel");
+
+        final com.google.gwt.user.client.ui.ListBox listBox =
+                new com.google.gwt.user.client.ui.ListBox();
+        listBox.addItem("");
+
+        for(ProcessDefinitionRef ref : processDefinitions)
+        {
+            listBox.addItem(ref.getName());
+        }
+
+        // show dialogue
+        LayoutPanel p = new LayoutPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL));
+        p.add(new HTML("Please select a process:"));
+        p.add(listBox);
+
+        // -----
+
+        LayoutPanel p2 = new LayoutPanel(new BoxLayout(BoxLayout.Orientation.HORIZONTAL));
+        p2.add(new Button("Done", new ClickHandler() {
+            public void onClick(ClickEvent clickEvent)
+            {
+                if(listBox.getSelectedIndex()>0)
                 {
+                    popup.hide();
+                    String procDef = listBox.getItemText(listBox.getSelectedIndex());
+                    update(procDef, getDefinitionId(procDef));
+                }
+            }
+        }));
 
-                    public void callback(List<String> response)
-                    {
-                        final LayoutPopupPanel popup = new LayoutPopupPanel(true);
-                        popup.addStyleName("soa-PopupPanel");
+        // -----
 
-                        final com.google.gwt.user.client.ui.ListBox listBox =
-                                new com.google.gwt.user.client.ui.ListBox();
-                        listBox.addItem("");
+        HTML html = new HTML("Cancel");
+        html.addClickHandler(new ClickHandler(){
+            public void onClick(ClickEvent clickEvent)
+            {
+                popup.hide();
+            }
+        });
+        p2.add(html, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
+        p.add(p2);
 
-                        for(String s : response)
-                        {
-                            listBox.addItem(s);
-                        }
+        // -----
 
-                        // show dialogue
-                        LayoutPanel p = new LayoutPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL));
-                        p.add(new HTML("Please select a process:"));
-                        p.add(listBox);
+        popup.setPopupPosition(menuButton.getAbsoluteLeft()-5, menuButton.getAbsoluteTop()+30);
+        popup.setWidget(p);
+        popup.pack();
+        popup.show();
 
-                        // -----
-
-                        LayoutPanel p2 = new LayoutPanel(new BoxLayout(BoxLayout.Orientation.HORIZONTAL));
-                        p2.add(new Button("Done", new ClickHandler() {
-                            public void onClick(ClickEvent clickEvent)
-                            {
-                                if(listBox.getSelectedIndex()>0)
-                                {
-                                    popup.hide();
-                                    update(listBox.getItemText(listBox.getSelectedIndex()));
-                                }
-                            }
-                        }));
-
-                        // -----
-
-                        HTML html = new HTML("Cancel");
-                        html.addClickHandler(new ClickHandler(){
-                            public void onClick(ClickEvent clickEvent)
-                            {
-                                popup.hide();
-                            }
-                        });
-                        p2.add(html, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
-                        p.add(p2);
-
-                        // -----
-
-                        popup.setPopupPosition(menuButton.getAbsoluteLeft()-5, menuButton.getAbsoluteTop()+30);
-                        popup.setWidget(p);
-                        popup.pack();
-                        popup.show();
-
-                    }
-                },
-                HistoryRecords.class
-        );
-
-        rpcService.getProcessDefinitionKeys();
 
     }
 
-    private void update(String procDef) {
+    private void update(String procDef, String processDefinitionId) {
         currentProcDef = procDef;
 
         String name = currentProcDef; // riftsaw name juggling
@@ -287,64 +340,58 @@ public class ExecutionHistoryView implements WidgetProvider
 
         title.setHTML(name + "<br/><div style='color:#C8C8C8;font-size:12px;text-align:left;'>"+subtitle+"</div>");
         TimespanValues ts = currentTimespan == null ? TimespanValues.LAST_7_DAYS : currentTimespan;
-        loadDatasets(currentProcDef, ts);
-    }
 
-    /**
-     * Loads the chronoscope data for a particlar processdefinition
-     * @param procDefID
-     * @param timespan
-     */
-    private void loadDatasets(final String procDefID, final TimespanValues timespan)
-    {
-
-        currentTimespan = timespan;
-        ((DefaultListModel)listBox.getModel()).clear();
-
-
-        ChartData rpcService = MessageBuilder.createCall(
-                new RemoteCallback<String>()
-                {
-                    public void callback(String jsonData)
-                    {
-                        LoadingOverlay.on(chartArea, false);
-                        timespanButton.setVisible(true);
-
-                        // feed chronoscope ...
-                        final Datasets<Tuple2D> datasets = new Datasets<Tuple2D>();
-                        DatasetReader datasetReader = ChronoscopeFactory.getInstance().getDatasetReader();
-                        JSOModel jsoModel = JSOModel.fromJson(jsonData);
-
-                        if(jsonData.startsWith("["))
-                        {
-                            for(int i=0; i<jsoModel.length(); i++)
-                            {
-                                datasets.add(datasetReader.createDatasetFromJson(
-                                        new GwtJsonDataset(jsoModel.get(i)))
-                                );
-                            }
-                        }
-                        else
-                        {
-                            datasets.add(datasetReader.createDatasetFromJson(
-                                    new GwtJsonDataset(jsoModel))
-                            );
-                        }
-
-
-                        renderChart(datasets);
-                        timespanPanel.layout();
-                    }
-                },
-                ChartData.class
-        );
 
         LoadingOverlay.on(chartArea, true);
 
-        if(includeFailed.getValue())
-            rpcService.getFailedInstances(procDefID, timespan.getCanonicalName());
+        LoadDatasetEvent theEvent = new LoadDatasetEvent();
+        theEvent.setDefinitionId(processDefinitionId);
+        theEvent.setTimespan(ts);
+        if (includeFailed.getValue()) {
+            theEvent.setIncludedFailed(true);
+        } else {
+            theEvent.setIncludedFailed(false);
+        }
+
+        currentTimespan = ts;
+
+        controller.handleEvent(new Event(LoadDatasetsAction.ID, theEvent));
+
+    }
+
+
+    public void updateChart(String chartData) {
+        ((DefaultListModel)listBox.getModel()).clear();
+
+        LoadingOverlay.on(chartArea, false);
+
+        timespanButton.setVisible(true);
+
+        // feed chronoscope ...
+        final Datasets<Tuple2D> datasets = new Datasets<Tuple2D>();
+        DatasetReader datasetReader = ChronoscopeFactory.getInstance().getDatasetReader();
+        JSOModel jsoModel = JSOModel.fromJson(chartData);
+
+        if(chartData.startsWith("["))
+        {
+            for(int i=0; i<jsoModel.length(); i++)
+            {
+                datasets.add(datasetReader.createDatasetFromJson(
+                        new GwtJsonDataset(jsoModel.get(i)))
+                );
+            }
+        }
         else
-            rpcService.getCompletedInstances(procDefID, timespan.getCanonicalName());
+        {
+            datasets.add(datasetReader.createDatasetFromJson(
+                    new GwtJsonDataset(jsoModel))
+            );
+        }
+
+
+        renderChart(datasets);
+        timespanPanel.layout();
+
     }
 
     private void renderChart(Datasets<Tuple2D> datasets)
@@ -393,16 +440,12 @@ public class ExecutionHistoryView implements WidgetProvider
                     Date date = new Date();
                     date.setTime((long) chronoDate.getTime());
 
-                    /*StringBuffer sb = new StringBuffer();
-                    sb.append("Range: " +event.getRange()).append("<br/>");
-                    sb.append("Date: " +date.toString()).append("<br/>");
-                    sb.append("TimeZone: ").append(DateTimeFormat.getFormat("Z").format(new Date())).append("<br/>");
-                    sb.append("DateF: " +DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss z").format(date)).append("<br/>");
-                    sb.append("ChronoDate: ").append(chronoDate.getTime()).append("<br/>");
-
-                    ConsoleLog.debug(sb.toString());*/
-
-                    loadInstances(date, event.getFocusDataset());
+                    LoadChartProcessInstanceEvent theEvent = new LoadChartProcessInstanceEvent();
+                    theEvent.setDefinitionId(getDefinitionId(currentProcDef));
+                    theEvent.setDate(date);
+                    theEvent.setDatasetType(event.getFocusDataset());
+                    theEvent.setTimespan(currentTimespan);
+                    controller.handleEvent(new Event(LoadChartProcessInstancesAction.ID, theEvent));
                 }
             }
         });
@@ -446,6 +489,18 @@ public class ExecutionHistoryView implements WidgetProvider
         });
     }
 
+
+    public void updateProcessInstances(List<StringRef> instances) {
+        DefaultListModel<String> listModel = (DefaultListModel)listBox.getModel();
+        listModel.clear();
+        for(StringRef instance : instances) {
+            listModel.add(instance.getValue());
+        }
+    }
+
+
+
+/**
     private void loadInstances(Date date, int datasetIndex)
     {
         ConsoleLog.debug("Loading instances for " +dateFormat.format(date));
@@ -478,6 +533,7 @@ public class ExecutionHistoryView implements WidgetProvider
 
         }
     }
+ **/
 
     private int[] calcChartDimension()
     {
@@ -508,4 +564,68 @@ public class ExecutionHistoryView implements WidgetProvider
         chartArea.layout();*/
         chartArea.layout();
     }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+
+        /**
+     * Loads the chronoscope data for a particlar processdefinition
+     * @param procDefID
+     * @param timespan
+     */
+    /**
+    private void loadDatasets(final String procDefID, final TimespanValues timespan)
+    {
+
+        currentTimespan = timespan;
+         ((DefaultListModel)listBox.getModel()).clear();
+
+        ChartData rpcService = MessageBuilder.createCall(
+                new RemoteCallback<String>()
+                {
+                    public void callback(String jsonData)
+                    {
+                        LoadingOverlay.on(chartArea, false);
+                        timespanButton.setVisible(true);
+
+                        // feed chronoscope ...
+                        final Datasets<Tuple2D> datasets = new Datasets<Tuple2D>();
+                        DatasetReader datasetReader = ChronoscopeFactory.getInstance().getDatasetReader();
+                        JSOModel jsoModel = JSOModel.fromJson(jsonData);
+
+                        if(jsonData.startsWith("["))
+                        {
+                            for(int i=0; i<jsoModel.length(); i++)
+                            {
+                                datasets.add(datasetReader.createDatasetFromJson(
+                                        new GwtJsonDataset(jsoModel.get(i)))
+                                );
+                            }
+                        }
+                        else
+                        {
+                            datasets.add(datasetReader.createDatasetFromJson(
+                                    new GwtJsonDataset(jsoModel))
+                            );
+                        }
+
+
+                        renderChart(datasets);
+                        timespanPanel.layout();
+                    }
+                },
+                ChartData.class
+        );
+
+        LoadingOverlay.on(chartArea, true);
+
+        if(includeFailed.getValue())
+            rpcService.getFailedInstances(procDefID, timespan.getCanonicalName());
+        else
+            rpcService.getCompletedInstances(procDefID, timespan.getCanonicalName());
+
+     }
+     **/
 }

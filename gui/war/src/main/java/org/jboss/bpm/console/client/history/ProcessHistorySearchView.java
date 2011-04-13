@@ -13,9 +13,6 @@ import org.gwt.mosaic.ui.client.layout.BoxLayoutData;
 import org.gwt.mosaic.ui.client.layout.LayoutPanel;
 import org.gwt.mosaic.ui.client.layout.MosaicPanel;
 import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
-import org.jboss.bpm.monitor.gui.client.HistoryRecords;
-import org.jboss.errai.bus.client.api.RemoteCallback;
-import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.workspaces.client.api.ProvisioningCallback;
 import org.jboss.errai.workspaces.client.api.WidgetProvider;
 import org.jboss.errai.workspaces.client.framework.Registry;
@@ -60,7 +57,6 @@ public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
         this.controller.addView(ID, this);
 		this.controller.addAction(LoadProcessHistoryAction.ID, new LoadProcessHistoryAction());
         this.controller.addAction(LoadProcessDefinitionsAction.ID, new LoadProcessDefinitionsAction());
-
 	}
 	
 	@Override

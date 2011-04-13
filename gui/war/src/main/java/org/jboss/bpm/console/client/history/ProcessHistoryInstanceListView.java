@@ -3,15 +3,17 @@
  */
 package org.jboss.bpm.console.client.history;
 
-import java.util.List;
-import java.util.StringTokenizer;
-
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.mvc4g.client.Controller;
+import com.mvc4g.client.Event;
+import com.mvc4g.client.ViewInterface;
 import org.gwt.mosaic.ui.client.DecoratedTabLayoutPanel;
 import org.gwt.mosaic.ui.client.ListBox;
 import org.gwt.mosaic.ui.client.ListBox.CellRenderer;
 import org.gwt.mosaic.ui.client.ScrollLayoutPanel;
-import org.gwt.mosaic.ui.client.event.RowSelectionEvent;
-import org.gwt.mosaic.ui.client.event.RowSelectionHandler;
 import org.gwt.mosaic.ui.client.layout.BoxLayout;
 import org.gwt.mosaic.ui.client.layout.BoxLayoutData;
 import org.gwt.mosaic.ui.client.layout.MosaicPanel;
@@ -20,25 +22,14 @@ import org.jboss.bpm.console.client.common.DataDriven;
 import org.jboss.bpm.console.client.common.LoadingOverlay;
 import org.jboss.bpm.console.client.common.WidgetWindowPanel;
 import org.jboss.bpm.console.client.model.HistoryProcessInstanceRef;
-import org.jboss.bpm.console.client.model.ProcessInstanceRef;
-import org.jboss.bpm.console.client.process.LoadInstanceActivityImage;
+import org.jboss.bpm.console.client.model.StringRef;
 import org.jboss.bpm.console.client.util.SimpleDateFormat;
-import org.jboss.bpm.monitor.gui.client.HistoryRecords;
-import org.jboss.errai.bus.client.api.RemoteCallback;
-import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.workspaces.client.api.ProvisioningCallback;
 import org.jboss.errai.workspaces.client.api.WidgetProvider;
 import org.jboss.errai.workspaces.client.framework.Registry;
 
-import com.google.gwt.event.dom.client.DoubleClickEvent;
-import com.google.gwt.event.dom.client.DoubleClickHandler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.mvc4g.client.Controller;
-import com.mvc4g.client.Event;
-import com.mvc4g.client.ViewInterface;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author Jeff Yu
@@ -61,12 +52,15 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
 	private WidgetWindowPanel processEventsWindow;
 		
 	private ListBox<String> processEvents;
+
+    private String selectedProcessInstanceId;
 		
 	@Override
 	public void provideWidget(ProvisioningCallback callback) {
 		
 		controller = Registry.get(Controller.class);
 		controller.addView(ID, this);
+        controller.addAction(LoadProcessInstanceEventsAction.ID, new LoadProcessInstanceEventsAction());
 		
 		panel = new MosaicPanel();
 		panel.setPadding(0);
@@ -111,7 +105,9 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
 				int index = listbox.getSelectedIndex();
 				if (index != -1) {
 					HistoryProcessInstanceRef historyInstance = listbox.getItem(index);
-					createHistoryInstanceDetailWindow(historyInstance.getProcessInstanceId());
+                    selectedProcessInstanceId = historyInstance.getProcessInstanceId();
+                    createHistoryInstanceDetailWindow();
+                    //controller.handleEvent(new Event(LoadProcessInstanceEventsAction.ID, selectedProcessInstanceId));
 				}
 			}
 			
@@ -158,13 +154,13 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
 	}
 	
 	
-	private void createHistoryInstanceDetailWindow(String processInstanceId) {
+	public void createHistoryInstanceDetailWindow() {
 		
 		org.gwt.mosaic.ui.client.layout.LayoutPanel layout = new ScrollLayoutPanel();
         layout.setStyleName("bpm-window-layout");
         layout.setPadding(5);
 
-        Label header = new Label("Instance: "+ processInstanceId);
+        Label header = new Label("Instance: "+ selectedProcessInstanceId);
         header.setStyleName("bpm-label-header");
         layout.add(header, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
         
@@ -185,20 +181,7 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
 				}				
 			}
         });
-        
-        
-        MessageBuilder.createCall(new RemoteCallback<List<String>>(){
-			
-        	public void callback(List<String> list) {
-        		final DefaultListModel<String> model = (DefaultListModel<String>)processEvents.getModel();
-        		model.clear();
-        		for (String value : list) {
-        			model.add(formatResult(value));
-        		}
-        	}
-        	
-        }, HistoryRecords.class).getAllEvents(processInstanceId);
-        
+
         MosaicPanel sourcePanel = new MosaicPanel();
         sourcePanel.add(processEvents, new BoxLayoutData(BoxLayoutData.FillStyle.VERTICAL));        
         tabPanel.add(sourcePanel, "Activity Events");
@@ -208,8 +191,21 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
         layout.add(tabPanel, new BoxLayoutData(BoxLayoutData.FillStyle.BOTH));
         
         processEventsWindow = new WidgetWindowPanel( "History Instance Activity", layout, true);
-        
+
+        controller.handleEvent(new Event(LoadProcessInstanceEventsAction.ID, selectedProcessInstanceId));
+
 	}
+
+
+
+    public void populateInstanceEvents(List<StringRef> refs) {
+        final DefaultListModel<String> model = (DefaultListModel<String>)processEvents.getModel();
+        model.clear();
+        for (StringRef value : refs) {
+            model.add(formatResult(value.getValue()));
+        }
+    }
+
 	
     private String formatResult(String value) {
     	StringBuffer sbuffer = new StringBuffer();

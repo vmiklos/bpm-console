@@ -157,7 +157,8 @@ public class Explorer implements WidgetProvider, DataDriven, ViewInterface {
                     MessageBuilder.createMessage()
                             .toSubject("process.execution.history")
                             .signalling()
-                            .with("processName", ref.getName()+"-"+ref.getVersion()) // hacky
+                            .with("processName", ref.getName()+"-"+ref.getVersion())// hacky
+                            .with("processDefinitionId", ref.getId())
                             .noErrorHandling().sendNowWith(ErraiBus.get());
                 }
             }
