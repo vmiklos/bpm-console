@@ -227,7 +227,10 @@ public class FormProcessingFacade
       final InputPart part = formData.get(partName);
       final MediaType mediaType = part.getMediaType();
 
-      if(MediaType.TEXT_PLAIN_TYPE.equals(mediaType))
+      String mType = mediaType.getType();
+      String mSubtype = mediaType.getSubtype();
+
+      if("text".equals(mType) && "plain".equals(mSubtype))
       {
         // RFC2045: Each part has an optional "Content-Type" header
         // that defaults to "text/plain".
