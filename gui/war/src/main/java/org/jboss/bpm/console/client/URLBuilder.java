@@ -254,9 +254,9 @@ public class URLBuilder
         return config.getConsoleServerUrl() + "/rs/history/definitions";
     }
 
-    public String getProcessHistoryInstancesURL(String id) {
+    public String getProcessHistoryInstanceKeysURL(String id) {
         String encodedId = URL.encode(id);
-        return config.getConsoleServerUrl() + "/rs/history/definition/" + encodedId + "/instances";
+        return config.getConsoleServerUrl() + "/rs/history/definition/" + encodedId + "/instancekeys";
     }
 
     public String getProcessHistoryActivityKeysURL(String instanceId) {

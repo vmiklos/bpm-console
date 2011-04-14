@@ -190,7 +190,7 @@ public class ProcessHistoryInstanceListView implements ViewInterface, WidgetProv
         
         layout.add(tabPanel, new BoxLayoutData(BoxLayoutData.FillStyle.BOTH));
         
-        processEventsWindow = new WidgetWindowPanel( "History Instance Activity", layout, true);
+        processEventsWindow = new WidgetWindowPanel("History Instance Activity", layout, true);
 
         controller.handleEvent(new Event(LoadProcessInstanceEventsAction.ID, selectedProcessInstanceId));
 

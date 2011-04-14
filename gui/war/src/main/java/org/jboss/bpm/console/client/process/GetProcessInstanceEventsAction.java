@@ -5,7 +5,6 @@ import com.google.gwt.http.client.Response;
 import com.mvc4g.client.Controller;
 import org.jboss.bpm.console.client.URLBuilder;
 import org.jboss.bpm.console.client.common.AbstractRESTAction;
-import org.jboss.bpm.console.client.history.ProcessHistoryInstanceListView;
 import org.jboss.bpm.console.client.model.JSOParser;
 import org.jboss.bpm.console.client.model.StringRef;
 

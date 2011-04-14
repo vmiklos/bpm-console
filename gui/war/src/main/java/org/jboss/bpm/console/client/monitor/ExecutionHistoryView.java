@@ -498,43 +498,6 @@ public class ExecutionHistoryView implements WidgetProvider, ViewInterface
         }
     }
 
-
-
-/**
-    private void loadInstances(Date date, int datasetIndex)
-    {
-        ConsoleLog.debug("Loading instances for " +dateFormat.format(date));
-
-        HistoryRecords call = MessageBuilder.createCall(
-                new RemoteCallback<Set<String>>()
-                {
-                    public void callback(Set<String> response) {
-                        DefaultListModel<String> listModel = (DefaultListModel)listBox.getModel();
-                        listModel.clear();
-                        for(String instanceId : response)
-                            listModel.add(instanceId);
-                    }
-                }, HistoryRecords.class
-        );
-
-        switch (datasetIndex)
-        {
-            case DATASET_COMPLETED:                
-                call.getCompletedInstances(currentProcDef, date.getTime(), currentTimespan.getCanonicalName());
-                break;
-            case DATASET_FAILED:
-                call.getFailedInstances(currentProcDef, date.getTime(), currentTimespan.getCanonicalName());
-                break;
-            case DATASET_TERMINATED:
-                call.getTerminatedInstances(currentProcDef, date.getTime(), currentTimespan.getCanonicalName());
-                break;
-            default:
-                throw new IllegalArgumentException("Unkown dataset index "+ datasetIndex);
-
-        }
-    }
- **/
-
     private int[] calcChartDimension()
     {
        // int w = (int) (chartArea.getOffsetWidth() * 0.50);
@@ -569,63 +532,4 @@ public class ExecutionHistoryView implements WidgetProvider, ViewInterface
         this.controller = controller;
     }
 
-
-        /**
-     * Loads the chronoscope data for a particlar processdefinition
-     * @param procDefID
-     * @param timespan
-     */
-    /**
-    private void loadDatasets(final String procDefID, final TimespanValues timespan)
-    {
-
-        currentTimespan = timespan;
-         ((DefaultListModel)listBox.getModel()).clear();
-
-        ChartData rpcService = MessageBuilder.createCall(
-                new RemoteCallback<String>()
-                {
-                    public void callback(String jsonData)
-                    {
-                        LoadingOverlay.on(chartArea, false);
-                        timespanButton.setVisible(true);
-
-                        // feed chronoscope ...
-                        final Datasets<Tuple2D> datasets = new Datasets<Tuple2D>();
-                        DatasetReader datasetReader = ChronoscopeFactory.getInstance().getDatasetReader();
-                        JSOModel jsoModel = JSOModel.fromJson(jsonData);
-
-                        if(jsonData.startsWith("["))
-                        {
-                            for(int i=0; i<jsoModel.length(); i++)
-                            {
-                                datasets.add(datasetReader.createDatasetFromJson(
-                                        new GwtJsonDataset(jsoModel.get(i)))
-                                );
-                            }
-                        }
-                        else
-                        {
-                            datasets.add(datasetReader.createDatasetFromJson(
-                                    new GwtJsonDataset(jsoModel))
-                            );
-                        }
-
-
-                        renderChart(datasets);
-                        timespanPanel.layout();
-                    }
-                },
-                ChartData.class
-        );
-
-        LoadingOverlay.on(chartArea, true);
-
-        if(includeFailed.getValue())
-            rpcService.getFailedInstances(procDefID, timespan.getCanonicalName());
-        else
-            rpcService.getCompletedInstances(procDefID, timespan.getCanonicalName());
-
-     }
-     **/
 }

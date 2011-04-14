@@ -83,7 +83,7 @@ public class ProcessHistoryFacade {
 
     @GET
     @Produces("application/json")
-    @Path("definition/{id}/instances")
+    @Path("definition/{id}/instancekeys")
     public Response getProcessInstanceKeys(@PathParam("id") String definitionId) {
         checkNotNull("definitionId", definitionId);
         List<String> instances = getProcessHistoryPlugin().getProcessInstanceKeys(definitionId);
