@@ -308,6 +308,7 @@
                     <localWorkers>2</localWorkers>
                     <soyc>false</soyc>
                     <style>OBF</style>
+                    <warSourceDirectory>${project.build.directory}/gwt-compiled</warSourceDirectory>
                     <webappDirectory>${project.build.directory}/gwt-compiled</webappDirectory>
                 </configuration>
                 <executions>
