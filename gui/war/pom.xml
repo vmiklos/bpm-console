@@ -432,6 +432,7 @@
                         </artifactItem>
                     </artifactItems>
                 </configuration>
+            </plugin>
           </plugins>
         </pluginManagement>
     </build>
