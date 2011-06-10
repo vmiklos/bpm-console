@@ -308,17 +308,15 @@
                     <localWorkers>2</localWorkers>
                     <soyc>false</soyc>
                     <style>OBF</style>
+                    <webappDirectory>${project.build.directory}/gwt-compiled</webappDirectory>
                 </configuration>
                 <executions>
                     <execution>
-                      <id>gwt-default</id>
+                      <id>gwt-clean-compile</id>
                         <goals>
                             <goal>clean</goal>
                             <goal>compile</goal>
                         </goals>
-                        <configuration>
-                          <webappDirectory>${default.war.output}</webappDirectory>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -371,6 +369,11 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <warSourceExcludes>.gwt-tmp/**</warSourceExcludes>
+                    <webResources>
+                      <webResource>
+                        <directory>${project.build.directory}/gwt-compiled</directory>
+                      </webResource>
+                    </webResources>
                     <webappDirectory>${default.war.output}</webappDirectory>
                 </configuration>
             </plugin>
@@ -508,22 +511,6 @@
             <build>
                 <plugins>
                   <plugin>
-                      <groupId>org.codehaus.mojo</groupId>
-                      <artifactId>gwt-maven-plugin</artifactId>
-                      <executions>
-                          <execution>
-                            <id>gwt-jbpm</id>
-                              <goals>
-                                  <goal>clean</goal>
-                                  <goal>compile</goal>
-                              </goals>
-                              <configuration>
-                                <webappDirectory>${jbpm.war.output}</webappDirectory>
-                              </configuration>
-                          </execution>
-                      </executions>
-                  </plugin>
-                  <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
                     <executions>
                       <execution>
@@ -648,22 +635,6 @@
             <build>
                 <plugins>
                   <plugin>
-                      <groupId>org.codehaus.mojo</groupId>
-                      <artifactId>gwt-maven-plugin</artifactId>
-                      <executions>
-                          <execution>
-                            <id>gwt-drools</id>
-                              <goals>
-                                  <goal>clean</goal>
-                                  <goal>compile</goal>
-                              </goals>
-                              <configuration>
-                                <webappDirectory>${drools.war.output}</webappDirectory>
-                              </configuration>
-                          </execution>
-                      </executions>
-                  </plugin>
-                  <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
                     <executions>
                       <execution>
@@ -784,22 +755,6 @@
             </properties>
             <build>
                 <plugins>
-                  <plugin>
-                      <groupId>org.codehaus.mojo</groupId>
-                      <artifactId>gwt-maven-plugin</artifactId>
-                      <executions>
-                          <execution>
-                            <id>gwt-riftsaw</id>
-                              <goals>
-                                  <goal>clean</goal>
-                                  <goal>compile</goal>
-                              </goals>
-                              <configuration>
-                                <webappDirectory>${riftsaw.war.output}</webappDirectory>
-                              </configuration>
-                          </execution>
-                      </executions>
-                  </plugin>
                   <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
                     <executions>

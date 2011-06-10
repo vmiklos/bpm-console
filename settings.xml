@@ -1,5 +1,5 @@
 <settings>
-  <localRepository>local-repository</localRepository>
+  <localRepository>/Users/jdcasey/workspace/temp/bpm-console/local-repository</localRepository>
   <mirrors>
     <mirror>
       <id>developer</id>
