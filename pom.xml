@@ -84,7 +84,7 @@
     <modules>
         <module>shared</module>
         <module>server</module>
-        <module>gui</module>
+        <!-- <module>gui</module> -->
     </modules>
 
     <dependencyManagement>
