@@ -35,6 +35,16 @@
             </roles>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <name>Jeff Yu</name>
+            <id>jeff.yuchang</id>
+            <email>cyu@redhat.com</email>
+            <organization>Red Hat</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+10</timezone>
+        </developer>
     </developers>
 
     <!-- IssueManagement -->
@@ -73,12 +83,12 @@
         <stax-api.version>1.0-2</stax-api.version>
         <report.server.version>1.3.0</report.server.version>
 
-        <errai.version>1.1-Final</errai.version>
+        <errai.version>1.2.2.Final</errai.version>
         <mvel.version>2.0.18-RC4</mvel.version>
         <guice.version>2.0</guice.version>
         <slf4j.version>1.5.2</slf4j.version>
 
-        <activity.monitor.version>1.0.0.CR1</activity.monitor.version>
+        <activity.monitor.version>1.0.0-SNAPSHOT</activity.monitor.version>
     </properties>
 
     <modules>
@@ -299,6 +309,7 @@
       <plugins>
         <plugin>
             <artifactId>maven-source-plugin</artifactId>
+            <version>2.1.2</version>
             <executions>
                 <execution>
                     <id>attach-sources</id>
@@ -346,6 +357,7 @@
 
                <plugin>
                    <artifactId>maven-surefire-plugin</artifactId>
+                   <version>2.7.2</version>
                    <configuration>
                        <skipTests>true</skipTests>
                        <failIfNoTests>false</failIfNoTests>
@@ -422,6 +434,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.7.2</version>
             </plugin>
         </plugins>
     </reporting>
@@ -435,6 +448,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.7.2</version>
                         <configuration>
                             <skipTests>false</skipTests>
                         </configuration>

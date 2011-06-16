@@ -89,6 +89,7 @@
             <groupId>org.jboss.bpm</groupId>
             <artifactId>activity-monitor-ui-lib</artifactId>
             <classifier>sources</classifier>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -129,13 +130,13 @@
             <groupId>org.jboss.bpm</groupId>
             <artifactId>gwt-console-rpc</artifactId>
             <classifier>sources</classifier>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.bpm</groupId>
             <artifactId>gwt-console-rpc</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -392,7 +393,7 @@
                         <configuration>
                             <tasks>
                                 <ant antfile="scripts/antrun-version.xml" inheritAll="false" inheritRefs="false">
-                                    <property name="version" value="${version}" />
+                                    <property name="version" value="${project.version}" />
                                     <property name="src.dir" value="${project.build.directory}/generated-sources/antrun" />
                                 </ant>
                             </tasks>
@@ -429,7 +430,7 @@
                 <configuration>
                     <artifactItems>
                         <artifactItem>
-                            <version>${version}</version>
+                            <version>${project.version}</version>
                             <type>jar</type>
                             <overWrite>true</overWrite>
                             <includes>**/*</includes>
@@ -502,7 +503,7 @@
                 <dependency>
                     <groupId>org.jboss.bpm</groupId>
                     <artifactId>gwt-console-profile-jbpm</artifactId>
-                    <version>${version}</version>
+                    <version>${project.version}</version>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
@@ -524,6 +525,7 @@
                           <outputDirectory>${jbpm.war.output}</outputDirectory>
                           <filters>
                             <filter>${project.basedir}/src/main/properties/jbpm.properties</filter>
+                            <filter>${project.basedir}/src/main/properties/common-deploy.properties</filter>
                           </filters>
                         </configuration>
                       </execution>
@@ -626,7 +628,7 @@
                 <dependency>
                     <groupId>org.jboss.bpm</groupId>
                     <artifactId>gwt-console-profile-drools</artifactId>
-                    <version>${version}</version>
+                    <version>${project.version}</version>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
@@ -648,6 +650,7 @@
                           <outputDirectory>${drools.war.output}</outputDirectory>
                           <filters>
                             <filter>${project.basedir}/src/main/properties/drools.properties</filter>
+                            <filter>${project.basedir}/src/main/properties/common-deploy.properties</filter>
                           </filters>
                         </configuration>
                       </execution>
@@ -747,7 +750,7 @@
                 <dependency>
                     <groupId>org.jboss.bpm</groupId>
                     <artifactId>gwt-console-profile-riftsaw</artifactId>
-                    <version>${version}</version>
+                    <version>${project.version}</version>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
@@ -769,6 +772,7 @@
                           <outputDirectory>${riftsaw.war.output}</outputDirectory>
                           <filters>
                             <filter>${project.basedir}/src/main/properties/riftsaw.properties</filter>
+                            <filter>${project.basedir}/src/main/properties/common-deploy.properties</filter>
                           </filters>
                         </configuration>
                       </execution>
