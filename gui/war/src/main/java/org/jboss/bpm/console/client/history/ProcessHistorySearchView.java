@@ -81,6 +81,11 @@ public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
 
 			@Override
 			public void onClick(ClickEvent clickEvent) {
+
+                if (definitionList.getVisibleItemCount() < 1) {
+                    return;
+                }
+
 				String proDef = definitionList.getValue(definitionList.getSelectedIndex());
 
                 String definitionId = null;
