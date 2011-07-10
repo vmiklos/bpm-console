@@ -82,7 +82,7 @@ public class ProcessHistorySearchView implements WidgetProvider, ViewInterface {
 			@Override
 			public void onClick(ClickEvent clickEvent) {
 
-                if (definitionList.getVisibleItemCount() < 1) {
+                if (definitionList.getItemCount() < 1) {
                     return;
                 }
 
