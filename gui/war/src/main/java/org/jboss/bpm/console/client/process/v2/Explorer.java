@@ -32,6 +32,7 @@ import org.jboss.bpm.console.client.common.DataDriven;
 import org.jboss.bpm.console.client.common.LoadingOverlay;
 import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
 import org.jboss.bpm.console.client.process.*;
+import org.jboss.bpm.console.client.util.ConsoleLog;
 import org.jboss.errai.bus.client.ErraiBus;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.workspaces.client.Workspace;
@@ -167,7 +168,9 @@ public class Explorer implements WidgetProvider, DataDriven, ViewInterface {
         actionMenu.addItem("Change Version", new Command()
         {
             public void execute() {
-                selectVersion();
+                if (getActiveDefinition() != null) {
+                    selectVersion();
+                }
             }
         });
         actions.setMenu(actionMenu);
