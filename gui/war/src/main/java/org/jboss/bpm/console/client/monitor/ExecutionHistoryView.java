@@ -167,10 +167,12 @@ public class ExecutionHistoryView implements WidgetProvider, ViewInterface
                 public void execute()
                 {
 
-                    LoadingOverlay.on(chartArea, true);
-
                     LoadDatasetEvent theEvent = new LoadDatasetEvent();
-                    theEvent.setDefinitionId(getDefinitionId(currentProcDef));
+                    String theDefinitionId = getDefinitionId(currentProcDef);
+                    if (theDefinitionId == null) {
+                        return ;
+                    }
+                    theEvent.setDefinitionId(theDefinitionId);
                     theEvent.setTimespan(ts);
                     currentTimespan = ts;
                     if (includeFailed.getValue()) {
@@ -179,6 +181,7 @@ public class ExecutionHistoryView implements WidgetProvider, ViewInterface
                         theEvent.setIncludedFailed(false);
                     }
 
+                    LoadingOverlay.on(chartArea, true);
                     controller.handleEvent(new Event(LoadDatasetsAction.ID, theEvent));
                 }
             });
@@ -218,16 +221,19 @@ public class ExecutionHistoryView implements WidgetProvider, ViewInterface
         {
             public void onValueChange(ValueChangeEvent<Boolean> isEnabled) {
 
-                LoadingOverlay.on(chartArea, true);
-
                 LoadDatasetEvent theEvent = new LoadDatasetEvent();
-                theEvent.setDefinitionId(getDefinitionId(currentProcDef));
+                String theDefinitionId = getDefinitionId(currentProcDef);
+                if (theDefinitionId == null) {
+                    return ;
+                }
+                theEvent.setDefinitionId(theDefinitionId);
                 theEvent.setTimespan(currentTimespan);
                 if (includeFailed.getValue()) {
                     theEvent.setIncludedFailed(true);
                 } else {
                     theEvent.setIncludedFailed(false);
                 }
+                LoadingOverlay.on(chartArea, true);
                 controller.handleEvent(new Event(LoadDatasetsAction.ID, theEvent));
             }
         });
@@ -255,6 +261,10 @@ public class ExecutionHistoryView implements WidgetProvider, ViewInterface
 
     private String getDefinitionId(String currentProcessDefinition) {
         String definitionId = null;
+
+        if (processDefinitions == null || processDefinitions.size() < 1) {
+            return null;
+        }
 
         for (ProcessDefinitionRef ref : processDefinitions) {
             if (currentProcessDefinition.equals(ref.getName())) {
@@ -441,7 +451,11 @@ public class ExecutionHistoryView implements WidgetProvider, ViewInterface
                     date.setTime((long) chronoDate.getTime());
 
                     LoadChartProcessInstanceEvent theEvent = new LoadChartProcessInstanceEvent();
-                    theEvent.setDefinitionId(getDefinitionId(currentProcDef));
+                    String theDefinitionId = getDefinitionId(currentProcDef);
+                    if (theDefinitionId == null) {
+                        return ;
+                    }
+                    theEvent.setDefinitionId(theDefinitionId);
                     theEvent.setDate(date);
                     theEvent.setDatasetType(event.getFocusDataset());
                     theEvent.setTimespan(currentTimespan);
