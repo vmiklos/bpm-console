@@ -230,46 +230,49 @@ public class FormProcessingFacade
       String mType = mediaType.getType();
       String mSubtype = mediaType.getSubtype();
 
-      if("text".equals(mType) && "plain".equals(mSubtype))
-      {
-        // RFC2045: Each part has an optional "Content-Type" header
-        // that defaults to "text/plain".
-        // Can go into process without conversion
-        if(mapping.isReserved(partName))
-          mapping.directives.put(partName, part.getBodyAsString());
-        else
-          mapping.processVars.put(partName, part.getBodyAsString());
-      }
-      else
-      {
-        // anything else turns into a DataHandler
-        final byte[] data = part.getBodyAsString().getBytes();
-        DataHandler dh = new DataHandler(
-            new DataSource()
-            {
-              public InputStream getInputStream() throws IOException
-              {
-                return new ByteArrayInputStream(data);
-              }
+      try{
+          if("text".equals(mType) && "plain".equals(mSubtype))
+          {
+            // RFC2045: Each part has an optional "Content-Type" header
+            // that defaults to "text/plain".
+            // Can go into process without conversion
+            if(mapping.isReserved(partName))
+              mapping.directives.put(partName, part.getBodyAsString());
+            else
+              mapping.processVars.put(partName, part.getBodyAsString());
+          }
+          else
+          {
+            // anything else turns into a DataHandler
+            final byte[] data = part.getBodyAsString().getBytes();
+            DataHandler dh = new DataHandler(
+                new DataSource()
+                {
+                  public InputStream getInputStream() throws IOException
+                  {
+                    return new ByteArrayInputStream(data);
+                  }
 
-              public OutputStream getOutputStream() throws IOException
-              {
-                throw new RuntimeException("This is a readonly DataHandler");
-              }
+                  public OutputStream getOutputStream() throws IOException
+                  {
+                    throw new RuntimeException("This is a readonly DataHandler");
+                  }
 
-              public String getContentType()
-              {
-                return mediaType.getType();
-              }
+                  public String getContentType()
+                  {
+                    return mediaType.getType();
+                  }
 
-              public String getName()
-              {
-                return partName;
-              }
-            }
-        );
-
-        mapping.processVars.put(partName, dh);
+                  public String getName()
+                  {
+                    return partName;
+                  }
+                }
+            );
+            mapping.processVars.put(partName, dh);
+          }
+      } catch (IOException e) {
+          throw new RuntimeException(e);
       }
     }
 
