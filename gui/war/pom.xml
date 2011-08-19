@@ -374,6 +374,9 @@
                     <webResources>
                       <webResource>
                         <directory>${project.build.directory}/gwt-compiled</directory>
+                        <excludes>
+                            <exclude>app/.junit_symbolMaps/*.symbolMap</exclude>
+                        </excludes>
                       </webResource>
                     </webResources>
                     <webappDirectory>${default.war.output}</webappDirectory>
@@ -852,7 +855,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
