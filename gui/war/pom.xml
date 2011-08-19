@@ -376,6 +376,8 @@
                         <directory>${project.build.directory}/gwt-compiled</directory>
                         <excludes>
                             <exclude>app/.junit_symbolMaps/*.symbolMap</exclude>
+                            <exclude>app/junit.html</exclude>
+			    <exclude>app/junit-standards.html</exclude>
                         </excludes>
                       </webResource>
                     </webResources>
