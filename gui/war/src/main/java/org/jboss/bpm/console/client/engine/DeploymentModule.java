@@ -30,7 +30,6 @@ import org.jboss.errai.workspaces.client.api.WidgetProvider;
 import org.jboss.errai.workspaces.client.api.annotations.LoadTool;
 
 @LoadTool(name = "Deployments", group = "Runtime", icon="deploymentIcon")
-@RequireRoles({"administrator"})
 public class DeploymentModule implements WidgetProvider
 {
   static DeploymentListView instance = null;
