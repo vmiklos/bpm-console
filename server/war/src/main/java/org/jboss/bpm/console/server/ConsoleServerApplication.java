@@ -21,8 +21,6 @@
  */
 package org.jboss.bpm.console.server;
 
-import org.jboss.bpm.report.ReportFacade;
-
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +28,10 @@ import java.util.Set;
 /**
  * JAX-RS core component.
  *
+ * Removed the ReportFacade module, this is exclusively for RiftSaw usage.
+ *
  * @author Heiko.Braun <heiko.braun@jboss.com>
+ * @author Jeff Yu <cyu@redhat.com>
  */
 public class ConsoleServerApplication extends Application
 {
@@ -45,7 +46,6 @@ public class ConsoleServerApplication extends Application
     singletons.add(new UserMgmtFacade());    
     singletons.add(new EngineFacade());
     singletons.add(new FormProcessingFacade());
-    singletons.add(new ReportFacade() );
     singletons.add(new ProcessHistoryFacade());
   }
 

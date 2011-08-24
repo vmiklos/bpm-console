@@ -209,10 +209,6 @@
       <artifactId>jaxb-impl</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.jboss.bpm</groupId>
-      <artifactId>report-core</artifactId>
-    </dependency>
 
   </dependencies>
 
