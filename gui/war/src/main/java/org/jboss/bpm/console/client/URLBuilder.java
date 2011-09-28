@@ -21,6 +21,7 @@
  */
 package org.jboss.bpm.console.client;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -103,10 +104,13 @@ public class URLBuilder
         return config.getConsoleServerUrl() + "/rs/process/instance/" + instanceId + "/activeNodeInfo";
     }
 
+
     public String getActivityImage(String processId, String instanceId)
     {
         String encodedId = URL.encode(processId);
-        return config.getConsoleServerUrl() + "/rs/process/definition/"+ encodedId+ "/image/"+instanceId;        
+        //This version number is just for forcing the browser to load the image every time, is not used by server-side.
+        String versionNo = String.valueOf(new Date().getTime());
+        return config.getConsoleServerUrl() + "/rs/process/definition/"+ encodedId+ "/image/"+instanceId + "?v=" + versionNo;
     }
 
 

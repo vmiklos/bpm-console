@@ -22,8 +22,6 @@
 package org.jboss.bpm.console.server;
 
 import com.google.gson.Gson;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.bpm.console.client.model.RoleAssignmentRef;
 import org.jboss.bpm.console.client.model.RoleAssignmentRefWrapper;
 import org.jboss.bpm.console.server.gson.GsonFactory;
@@ -31,6 +29,8 @@ import org.jboss.bpm.console.server.integration.ManagementFactory;
 import org.jboss.bpm.console.server.integration.UserManagement;
 import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -52,7 +52,7 @@ import java.util.*;
 public class UserMgmtFacade
 {
 
-  private static final Log log = LogFactory.getLog(UserMgmtFacade.class);
+  private static final Logger log = LoggerFactory.getLogger(UserMgmtFacade.class);
 
   private UserManagement userManagement;
 

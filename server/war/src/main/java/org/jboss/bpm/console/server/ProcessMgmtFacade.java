@@ -22,8 +22,7 @@
 package org.jboss.bpm.console.server;
 
 import com.google.gson.Gson;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.jboss.bpm.console.client.model.*;
 import org.jboss.bpm.console.server.gson.GsonFactory;
 import org.jboss.bpm.console.server.integration.ManagementFactory;
@@ -32,6 +31,8 @@ import org.jboss.bpm.console.server.plugin.*;
 import org.jboss.bpm.console.server.util.Payload2XML;
 import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -55,7 +56,7 @@ import java.util.Map;
     description = "Process related data.")
 public class ProcessMgmtFacade
 {
-  private static final Log log = LogFactory.getLog(ProcessMgmtFacade.class);
+  private static final Logger log = LoggerFactory.getLogger(ProcessMgmtFacade.class);
 
   private ProcessManagement processManagement;
   private GraphViewerPlugin graphViewerPlugin;

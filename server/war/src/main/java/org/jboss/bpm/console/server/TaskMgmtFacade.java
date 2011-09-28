@@ -21,14 +21,14 @@
  */
 package org.jboss.bpm.console.server;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.bpm.console.server.integration.ManagementFactory;
 import org.jboss.bpm.console.server.integration.TaskManagement;
 import org.jboss.bpm.console.server.plugin.FormDispatcherPlugin;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
 import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -48,7 +48,7 @@ import javax.ws.rs.core.Response;
 )
 public class TaskMgmtFacade
 {
-  private static final Log log = LogFactory.getLog(TaskMgmtFacade.class);
+  private static final Logger log = LoggerFactory.getLogger(TaskMgmtFacade.class);
 
   private TaskManagement taskManagement;
 

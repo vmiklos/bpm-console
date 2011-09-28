@@ -22,8 +22,8 @@
 package org.jboss.bpm.console.server.util;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -49,7 +49,7 @@ import java.util.*;
  */
 public final class DOMUtils
 {
-   private static Log log = LogFactory.getLog(DOMUtils.class);
+   private static Logger log = LoggerFactory.getLogger(DOMUtils.class);
 
    // All elements created by the same thread are created by the same builder and belong to the same doc
    private static ThreadLocal<Document> documentThreadLocal = new ThreadLocal<Document>();

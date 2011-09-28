@@ -45,7 +45,8 @@ public class ConsoleServerApplication extends Application
     singletons.add(new UserMgmtFacade());    
     singletons.add(new EngineFacade());
     singletons.add(new FormProcessingFacade());
-    singletons.add(new ReportFacade() );
+    //TODO: comment it for now, it is only used in jBPM
+    //singletons.add(new ReportFacade() );
     singletons.add(new ProcessHistoryFacade());
   }
 

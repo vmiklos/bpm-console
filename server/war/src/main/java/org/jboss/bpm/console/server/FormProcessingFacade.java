@@ -21,8 +21,6 @@
  */
 package org.jboss.bpm.console.server;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.bpm.console.client.model.ProcessInstanceRef;
 import org.jboss.bpm.console.server.integration.ManagementFactory;
 import org.jboss.bpm.console.server.integration.ProcessManagement;
@@ -34,6 +32,8 @@ import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -61,7 +61,7 @@ import java.util.Map;
 )
 public class FormProcessingFacade
 {
-  private static final Log log = LogFactory.getLog(FormProcessingFacade.class);
+  private static final Logger log = LoggerFactory.getLogger(FormProcessingFacade.class);
 
   private FormDispatcherPlugin formPlugin;
 

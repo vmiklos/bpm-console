@@ -22,8 +22,6 @@
 package org.jboss.bpm.console.server;
 
 import com.google.gson.Gson;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.bpm.console.client.model.TaskRef;
 import org.jboss.bpm.console.client.model.TaskRefWrapper;
 import org.jboss.bpm.console.server.gson.GsonFactory;
@@ -34,6 +32,8 @@ import org.jboss.bpm.console.server.plugin.FormAuthorityRef;
 import org.jboss.bpm.console.server.plugin.FormDispatcherPlugin;
 import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -56,7 +56,7 @@ import java.util.List;
 )
 public class TaskListFacade
 {
-  private static final Log log = LogFactory.getLog(TaskMgmtFacade.class);
+  private static final Logger log = LoggerFactory.getLogger(TaskMgmtFacade.class);
 
   private TaskManagement taskManagement;
   private FormDispatcherPlugin formPlugin;

@@ -14,8 +14,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.bpm.console.client.model.*;
 import org.jboss.bpm.console.server.gson.GsonFactory;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
@@ -24,6 +22,8 @@ import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
 
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -38,7 +38,7 @@ import com.google.gson.Gson;
 )
 public class ProcessHistoryFacade {
 	
-	private static final Log log = LogFactory.getLog(ProcessHistoryFacade.class);
+	private static final Logger log = LoggerFactory.getLogger(ProcessHistoryFacade.class);
 	
 	private ProcessHistoryPlugin historyPlugin;
 	

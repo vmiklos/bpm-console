@@ -22,8 +22,6 @@
 package org.jboss.bpm.console.server;
 
 import com.google.gson.Gson;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.bpm.console.client.model.DeploymentRef;
 import org.jboss.bpm.console.client.model.DeploymentRefWrapper;
 import org.jboss.bpm.console.client.model.JobRef;
@@ -33,6 +31,8 @@ import org.jboss.bpm.console.server.plugin.ProcessEnginePlugin;
 import org.jboss.bpm.console.server.plugin.PluginMgr;
 import org.jboss.bpm.console.server.util.ProjectName;
 import org.jboss.bpm.console.server.util.RsComment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -50,7 +50,7 @@ import java.util.List;
 )
 public class EngineFacade
 {
-  private static final Log log = LogFactory.getLog(EngineFacade.class);
+  private static final Logger log = LoggerFactory.getLogger(EngineFacade.class);
 
   private ProcessEnginePlugin processEnginePlugin;
 
