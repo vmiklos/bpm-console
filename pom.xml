@@ -411,21 +411,6 @@
     <!-- Repositories -->
     <repositories>
         <repository>
-            <id>repository.jboss.org</id>
-            <url>http://repository.jboss.org/maven2</url>
-        </repository>
-        <repository>
-            <id>snapshots.jboss.org</id>
-            <name>JBoss Snapshot Repository</name>
-            <url>http://snapshots.jboss.org/maven2</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>maven2.java.net</id>
             <name>Java.net Repository for Maven 2</name>
             <url>http://download.java.net/maven/2/</url>
@@ -446,32 +431,47 @@
             <id>gwt-maven</id>
             <url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/</url>
         </repository>
+    <!-- Conventions are described in http://community.jboss.org/wiki/MavenGettingStarted-Developers -->
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>jboss-deprecated</id>
+      <name>JBoss Deprecated</name>
+      <url>https://repository.jboss.org/nexus/content/repositories/deprecated/</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
     </repositories>
 
     <pluginRepositories>
-        <pluginRepository>
-            <id>maven2.java.net</id>
-            <name>Java.net Repository for Maven 2</name>
-            <url>http://download.java.net/maven/2/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>repository.jboss.org</id>
-            <url>http://repository.jboss.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>snapshots.jboss.org</id>
-            <url>http://snapshots.jboss.org/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>gwt-maven</id>
-            <url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/</url>
-        </pluginRepository>
+    <pluginRepository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
 
     </pluginRepositories>
 
