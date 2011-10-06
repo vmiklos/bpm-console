@@ -411,6 +411,18 @@ public class ProcessMgmtFacade
 
   }
 
+  @GET
+  @Path("definition/history/{id}/instances")
+  @Produces("application/json")
+  public Response getCompletedInstances(
+      @PathParam("id")
+      String definitionId)
+  {
+	  ProcessInstanceRefWrapper wrapper =
+		  new ProcessInstanceRefWrapper(getProcessManagement().getHistoricProcessInstances(definitionId));
+	  return createJsonResponse(wrapper);
+  }
+
   private Response createJsonResponse(Object wrapper)
   {
     Gson gson = GsonFactory.createInstance();
