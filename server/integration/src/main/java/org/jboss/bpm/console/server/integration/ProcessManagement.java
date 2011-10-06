@@ -40,6 +40,8 @@ public interface ProcessManagement
   List<ProcessDefinitionRef> removeProcessDefinition(String definitionId);
 
   List<ProcessInstanceRef> getProcessInstances(String definitionId);
+  
+  List<ProcessInstanceRef> getHistoricProcessInstances(String definitionId);
 
   ProcessInstanceRef getProcessInstance(String instanceId);
 
