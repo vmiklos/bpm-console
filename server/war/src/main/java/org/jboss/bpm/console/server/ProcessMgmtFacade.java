@@ -42,6 +42,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.bpm.console.client.model.ActiveNodeInfo;
+import org.jboss.bpm.console.client.model.NodeInstanceRefWrapper;
 import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
 import org.jboss.bpm.console.client.model.ProcessDefinitionRefWrapper;
 import org.jboss.bpm.console.client.model.ProcessInstanceRef;
@@ -385,6 +386,18 @@ public class ProcessMgmtFacade
   {
 	  ProcessInstanceRefWrapper wrapper =
 		  new ProcessInstanceRefWrapper(getProcessManagement().getHistoricProcessInstances(definitionId));
+	  return createJsonResponse(wrapper);
+  }
+
+  @GET
+  @Path("history/{processInstanceId}/nodes")
+  @Produces("application/json")
+  public Response getCompletedNodes(
+      @PathParam("processInstanceId")
+      String processInstanceId)
+  {
+	  NodeInstanceRefWrapper wrapper =
+		  new NodeInstanceRefWrapper(getProcessManagement().getNodeInstances(processInstanceId));
 	  return createJsonResponse(wrapper);
   }
 
