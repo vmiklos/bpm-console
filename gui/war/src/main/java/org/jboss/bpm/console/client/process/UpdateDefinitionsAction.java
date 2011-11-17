@@ -24,6 +24,8 @@ package org.jboss.bpm.console.client.process;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.Response;
 import com.mvc4g.client.Controller;
+
+import org.jboss.bpm.console.client.ApplicationContext;
 import org.jboss.bpm.console.client.URLBuilder;
 import org.jboss.bpm.console.client.common.AbstractRESTAction;
 import org.jboss.bpm.console.client.common.DataDriven;
@@ -31,6 +33,7 @@ import org.jboss.bpm.console.client.model.JSOParser;
 import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
 import org.jboss.bpm.console.client.process.v2.Explorer;
 import org.jboss.bpm.console.client.util.ConsoleLog;
+import org.jboss.errai.workspaces.client.framework.Registry;
 
 import java.util.List;
 
@@ -43,6 +46,7 @@ import java.util.List;
 public class UpdateDefinitionsAction extends AbstractRESTAction
 {
   public final static String ID = UpdateDefinitionsAction.class.getName();
+  private ApplicationContext appContext;
 
   public String getId()
   {
@@ -67,18 +71,28 @@ public class UpdateDefinitionsAction extends AbstractRESTAction
 
   public void handleSuccessfulResponse(final Controller controller, final Object event, Response response)
   {
-    long start = System.currentTimeMillis();
-
-    Explorer view = (Explorer) controller.getView(Explorer.class.getName());
-    if(view!=null) // may not be initialized (lazy)
-    {      
-      List<ProcessDefinitionRef> definitions =
-          JSOParser.parseProcessDefinitions(response.getText());
-      view.update(definitions);
-      ConsoleLog.info("Loaded " + definitions.size() + " process definitions in " +(System.currentTimeMillis()-start)+" ms");
-
-    }
-
-
+	  this.appContext = Registry.get(ApplicationContext.class);
+	  boolean isjBPMInstance = appContext.getConfig().getProfileName().equals("jBPM Console");
+	  long start = System.currentTimeMillis();
+	  if(isjBPMInstance) {
+		  DefinitionListView view = (DefinitionListView) controller.getView(DefinitionListView.ID);
+		  if(view!=null) // may not be initialized (lazy)
+		  {
+		    //JSONValue json = JSONParser.parse(response.getText());
+		    List<ProcessDefinitionRef> definitions =
+		        JSOParser.parseProcessDefinitions(response.getText());
+		    view.update(definitions);
+		    ConsoleLog.info("Loaded " + definitions.size() + " process definitions in " +(System.currentTimeMillis()-start)+" ms");
+		  }
+	  } else {
+		  Explorer view = (Explorer) controller.getView(Explorer.class.getName());
+		  if(view!=null) // may not be initialized (lazy)
+		  {      
+			  List<ProcessDefinitionRef> definitions =
+		            JSOParser.parseProcessDefinitions(response.getText());
+		      view.update(definitions);
+		      ConsoleLog.info("Loaded " + definitions.size() + " process definitions in " +(System.currentTimeMillis()-start)+" ms");
+		  }
+	  }
   }
 }

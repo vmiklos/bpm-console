@@ -38,6 +38,14 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>xml-apis</groupId>
+                	<artifactId>xml-apis</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -114,6 +122,10 @@
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-tools</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -138,6 +150,12 @@
             <artifactId>gwt-console-rpc</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>xml-apis</groupId>
+            		<artifactId>xml-apis</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -484,14 +502,15 @@
                     <version>1.6</version>
                 </dependency>
 
-                <dependency>
+                <!-- <dependency>
                     <groupId>javassist</groupId>
                     <artifactId>javassist</artifactId>
                     <scope>provided</scope>
                     <version>3.12.1.GA</version>
-                </dependency>
+                </dependency> -->
             </dependencies>
         </profile>
+        
         <!--
          =======================================================
           jBPM Profile (default)
@@ -501,7 +520,8 @@
             <id>jbpm</id>
             <activation>
                 <property>
-                    <name>!console.profile</name>
+                    <name>console.profile</name>
+                    <value>jbpm</value>
                 </property>
             </activation>
             <dependencies>
@@ -513,7 +533,8 @@
                 </dependency>
             </dependencies>
             <properties>
-              <jbpm.war.output>${project.build.directory}/jbpm-war</jbpm.war.output>
+                <console.app.webcontext>jbpm-console</console.app.webcontext>
+              	<jbpm.war.output>${project.build.directory}/jbpm-war</jbpm.war.output>
             </properties>
             <build>
                 <plugins>
@@ -568,13 +589,15 @@
                                         <artifactItem>
                                             <groupId>org.jboss.bpm</groupId>
                                             <artifactId>gwt-console-profile-jbpm</artifactId>
+                                            <version>${version}</version>
+                                            <type>jar</type>
+                                            <overWrite>true</overWrite>
                                             <outputDirectory>${jbpm.war.output}/app</outputDirectory>
+                                            <includes>**/*</includes>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
                             </execution>
-                            <!-- the war:war goal removes the unpacked config
-                            hence the redundant call here -->
                             <execution>
                                 <id>unpack-profile-jbpm2</id>
                                 <phase>prepare-package</phase>
@@ -586,15 +609,20 @@
                                         <artifactItem>
                                             <groupId>org.jboss.bpm</groupId>
                                             <artifactId>gwt-console-profile-jbpm</artifactId>
-                                            <outputDirectory>${jbpm.war.output}/app</outputDirectory>
+                                            <version>${version}</version>
+                                            <type>jar</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${jbpm.war.output}</outputDirectory>
+                                            <!-- <excludes>
+	                                            <exclude>**/app.html</exclude>
+	                                            <exclude>**/errai-proxy.json</exclude>
+                                            </excludes> -->
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
                             </execution>
-
                         </executions>
                     </plugin>
-
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
@@ -613,128 +641,6 @@
                     </plugin>
                 </plugins>
 
-            </build>
-        </profile>
-
-        <!--
-           =======================================================
-            Drools Profile
-           =======================================================
-        -->
-        <profile>
-            <id>drools</id>
-            <activation>
-                <property>
-                    <name>console.profile</name>
-                    <value>drools</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jboss.bpm</groupId>
-                    <artifactId>gwt-console-profile-drools</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-              <drools.war.output>${project.build.directory}/drools-war</drools.war.output>
-            </properties>
-            <build>
-                <plugins>
-                  <plugin>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <executions>
-                      <execution>
-                        <id>hosted-mode-drools</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                          <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                          <outputDirectory>${drools.war.output}</outputDirectory>
-                          <filters>
-                            <filter>${project.basedir}/src/main/properties/drools.properties</filter>
-                            <filter>${project.basedir}/src/main/properties/common-deploy.properties</filter>
-                          </filters>
-                        </configuration>
-                      </execution>
-                      <execution>
-                        <id>deploy-mode-drools</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                          <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                          <outputDirectory>${drools.war.output}</outputDirectory>
-                          <filters>
-                            <filter>${project.basedir}/src/main/properties/common-deploy.properties</filter>
-                            <filter>${project.basedir}/src/main/properties/drools.properties</filter>
-                          </filters>
-                          <excludes>
-                            <exclude>**/errai-proxy.json</exclude>
-                          </excludes>
-                        </configuration>
-                      </execution>
-                    </executions>
-                  </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-
-                            <execution>
-                                <id>unpack-profile-drools</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.jboss.bpm</groupId>
-                                            <artifactId>gwt-console-profile-drools</artifactId>
-                                            <outputDirectory>${drools.war.output}/app</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>unpack-profile-drools2</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.jboss.bpm</groupId>
-                                            <artifactId>gwt-console-profile-drools</artifactId>
-                                            <outputDirectory>${drools.war.output}/app</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <executions>
-                          <execution>
-                            <id>drools-war</id>
-                            <goals>
-                              <goal>war</goal>
-                            </goals>
-                            <configuration>
-                              <webappDirectory>${drools.war.output}</webappDirectory>
-                              <classifier>drools</classifier>
-                            </configuration>
-                          </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
             </build>
         </profile>
 

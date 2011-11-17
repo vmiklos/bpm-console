@@ -83,21 +83,24 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
     private ProcessDefinitionRef currentDefintion;
 
     private boolean isRiftsawInstance;
+    private boolean isjBPMInstance;
     
     private  ListBox<String> processEvents;
 
     public InstanceDetailView()
     {
         super("Execution details");
-
-        controller = Registry.get(Controller.class);
-
-        controller.addView(ID, this);
-        controller.addAction(GetProcessInstanceEventsAction.ID, new GetProcessInstanceEventsAction());
-
-
+        
         this.appContext = Registry.get(ApplicationContext.class);
         isRiftsawInstance = appContext.getConfig().getProfileName().equals("BPEL Console");
+        isjBPMInstance = appContext.getConfig().getProfileName().equals("jBPM Console");
+        
+        
+        if(isRiftsawInstance) {
+        	controller = Registry.get(Controller.class);
+        	controller.addView(ID, this);
+        	controller.addAction(GetProcessInstanceEventsAction.ID, new GetProcessInstanceEventsAction());
+        }
 
         super.setStyleName("bpm-detail-panel");
         super.setLayout(new BoxLayout(BoxLayout.Orientation.HORIZONTAL));
@@ -109,43 +112,69 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
         this.add(grid, new BoxLayoutData(BoxLayoutData.FillStyle.BOTH));
 
         MosaicPanel buttonPanel = new MosaicPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL) );
-        diagramBtn = new Button("Execution Path",
-                new ClickHandler()
-                {
-                    public void onClick(ClickEvent clickEvent)
-                    {
-                        String diagramUrl = getCurrentDefintion().getDiagramUrl();
-                        if(diagramUrl !=null && !diagramUrl.equals(""))
-                        {
-                            final ProcessInstanceRef selection = getCurrentInstance();
-                            if(selection!=null)
-                            {
-                                createDiagramWindow(selection);
-
-                                DeferredCommand.addCommand(new Command()
-                                {
-                                    public void execute() {
-                                        controller.handleEvent(
-                                                new Event(LoadInstanceActivityImage.class.getName(), selection)
-                                        );
-                                    }
-                                }
-                                );
-
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.alert("Incomplete deployment", "No diagram associated with process");
-                        }
-                    }
-                }
-        );
-        //diagramBtn.setVisible(!isRiftsawInstance);
-
+        
+        if(isRiftsawInstance) {
+	        diagramBtn = new Button("Execution Path",
+	                new ClickHandler()
+	                {
+	                    public void onClick(ClickEvent clickEvent)
+	                    {
+	                        String diagramUrl = getCurrentDefintion().getDiagramUrl();
+	                        if(diagramUrl !=null && !diagramUrl.equals(""))
+	                        {
+	                            final ProcessInstanceRef selection = getCurrentInstance();
+	                            if(selection!=null)
+	                            {
+	                                createDiagramWindow(selection);
+	
+	                                DeferredCommand.addCommand(new Command()
+	                                {
+	                                    public void execute() {
+	                                        controller.handleEvent(
+	                                                new Event(LoadInstanceActivityImage.class.getName(), selection)
+	                                        );
+	                                    }
+	                                }
+	                                );
+	
+	                            }
+	                        }
+	                        else
+	                        {
+	                            MessageBox.alert("Incomplete deployment", "No diagram associated with process");
+	                        }
+	                    }
+	                }
+	        );
+        } else if(isjBPMInstance) {
+        	diagramBtn = new Button("Diagram",
+        	        new ClickHandler()
+        	        {
+        	          public void onClick(ClickEvent clickEvent)
+        	          {
+        	            String diagramUrl = getCurrentDefintion().getDiagramUrl();
+        	            if(diagramUrl !=null && !diagramUrl.equals(""))
+        	            {
+        	              ProcessInstanceRef selection = getCurrentInstance();
+        	              if(selection!=null)
+        	              {
+        	                createDiagramWindow(selection);
+        	                controller.handleEvent(
+        	                    new Event(LoadActivityDiagramAction.ID, selection)
+        	                );
+        	              }
+        	            }
+        	            else
+        	            {
+        	              MessageBox.alert("Incomplete deployment", "No diagram associated with process");
+        	            }
+        	          }
+        	        }
+        	    );
+        	    diagramBtn.setVisible(!isRiftsawInstance);
+        }
         diagramBtn.setEnabled(false);
         buttonPanel.add(diagramBtn, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
-
         instanceDataBtn = new Button("Instance Data",
                 new ClickHandler()
                 {
@@ -173,7 +202,7 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
 
     private void createDiagramWindow(ProcessInstanceRef inst)
     {
-        
+        if(isRiftsawInstance) {
     	org.gwt.mosaic.ui.client.layout.LayoutPanel layout = new ScrollLayoutPanel();
         layout.setStyleName("bpm-window-layout");
         layout.setPadding(5);
@@ -220,6 +249,22 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
         );
 
         controller.handleEvent(new Event(GetProcessInstanceEventsAction.ID, inst.getId()));
+        } else if(isjBPMInstance) {
+        	MosaicPanel layout = new MosaicPanel(new BoxLayout(BoxLayout.Orientation.VERTICAL));
+            layout.setStyleName("bpm-window-layout");
+            layout.setPadding(5);
+
+            Label header = new Label("Instance: "+inst.getId());
+            header.setStyleName("bpm-label-header");
+            layout.add(header, new BoxLayoutData(BoxLayoutData.FillStyle.HORIZONTAL));
+
+            layout.add(diagramView, new BoxLayoutData(BoxLayoutData.FillStyle.BOTH));
+
+            diagramWindowPanel = new WidgetWindowPanel(
+                "Process Instance Activity",
+                layout, true
+            );    
+        }
     }
 
 
@@ -262,7 +307,9 @@ public class InstanceDetailView extends CaptionLayoutPanel implements ViewInterf
         controller.addView(ActivityDiagramView.ID, diagramView);
         controller.addView(InstanceDataView.ID, instanceDataView);
         controller.addAction(LoadActivityDiagramAction.ID, new LoadActivityDiagramAction());
-        controller.addAction(LoadInstanceActivityImage.class.getName(), new LoadInstanceActivityImage());
+        if(isRiftsawInstance) {
+        	controller.addAction(LoadInstanceActivityImage.class.getName(), new LoadInstanceActivityImage());
+        }
         controller.addAction(UpdateInstanceDataAction.ID, new UpdateInstanceDataAction());
     }
 

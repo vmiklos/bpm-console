@@ -20,6 +20,12 @@
       <groupId>org.jboss.bpm</groupId>
       <artifactId>gwt-console-rpc</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+      	<exclusion>
+        	<groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

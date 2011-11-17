@@ -81,12 +81,12 @@
         <!--mosaic.version>0.4.0-rc4</mosaic.version-->
         <resteasy.version>2.2.1.GA</resteasy.version>
         <stax-api.version>1.0-2</stax-api.version>
-        <report.server.version>1.3.0</report.server.version>
+        <report.server.version>1.4.0-SNAPSHOT</report.server.version>
 
         <errai.version>1.1-Final</errai.version>
         <mvel.version>2.0.18-RC4</mvel.version>
         <guice.version>2.0</guice.version>
-        <slf4j.version>1.5.2</slf4j.version>
+        <slf4j.version>1.6.0</slf4j.version>
 
         <activity.monitor.version>1.1.0-SNAPSHOT</activity.monitor.version>
     </properties>
@@ -275,6 +275,24 @@
                 <groupId>org.jboss.errai</groupId>
                 <artifactId>errai-bus</artifactId>
                 <version>${errai.version}</version>
+                <exclusions>
+            		<exclusion>
+            			<groupId>org.slf4j</groupId>
+            			<artifactId>slf4j-api</artifactId>
+            		</exclusion>
+            		<exclusion>
+            			<groupId>org.slf4j</groupId>
+            			<artifactId>slf4j-log4j12</artifactId>
+            		</exclusion>
+            		<exclusion>
+                    	<groupId>javassist</groupId>
+                    	<artifactId>javassist</artifactId>
+                	</exclusion>
+                	<exclusion>
+                		<groupId>xml-apis</groupId>
+                		<artifactId>xml-apis</artifactId>
+                	</exclusion>
+            	</exclusions>
             </dependency>
 
             <dependency>
@@ -287,6 +305,24 @@
                 <artifactId>errai-bus</artifactId>
                 <version>${errai.version}</version>
                 <classifier>sources</classifier>
+                <exclusions>
+            	<exclusion>
+            		<groupId>org.slf4j</groupId>
+            		<artifactId>slf4j-api</artifactId>
+            	</exclusion>
+            	<exclusion>
+            		<groupId>org.slf4j</groupId>
+            		<artifactId>slf4j-log4j12</artifactId>
+            	</exclusion>
+            	<exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>xml-apis</groupId>
+                	<artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
             </dependency>
 
             <dependency>
