@@ -53,6 +53,7 @@ public abstract class AbstractRESTAction implements ActionInterface
   {
     final String url = getUrl(object);
     RequestBuilder builder = new RequestBuilder(getRequestMethod(), URL.encode(url));
+    builder.setTimeoutMillis(0); // disabling timeouts on RequestBuilder
 
     ConsoleLog.debug(getRequestMethod() +": " + url);
 
