@@ -121,7 +121,7 @@ public abstract class AbstractRESTAction implements ActionInterface
 
         }
       };
-      t.schedule(20000);
+      t.schedule(60000);
 
     }
     catch (RequestException e)

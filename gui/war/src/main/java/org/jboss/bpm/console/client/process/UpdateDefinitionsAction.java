@@ -43,7 +43,7 @@ import java.util.List;
  *
  * @author Heiko.Braun <heiko.braun@jboss.com>
  */
-public class UpdateDefinitionsAction extends AbstractRESTAction
+public class UpdateDefinitionsAction extends AbstractRESTAction 
 {
   public final static String ID = UpdateDefinitionsAction.class.getName();
   private ApplicationContext appContext;
@@ -72,13 +72,12 @@ public class UpdateDefinitionsAction extends AbstractRESTAction
   public void handleSuccessfulResponse(final Controller controller, final Object event, Response response)
   {
 	  this.appContext = Registry.get(ApplicationContext.class);
-	  boolean isjBPMInstance = appContext.getConfig().getProfileName().equals("jBPM Console");
+	  boolean isjBPMInstance = appContext.getConfig().getProfileName().equals("jBPM Console"); 
 	  long start = System.currentTimeMillis();
 	  if(isjBPMInstance) {
 		  DefinitionListView view = (DefinitionListView) controller.getView(DefinitionListView.ID);
-		  if(view!=null) // may not be initialized (lazy)
+		  if(view != null) // may not be initialized (lazy)
 		  {
-		    //JSONValue json = JSONParser.parse(response.getText());
 		    List<ProcessDefinitionRef> definitions =
 		        JSOParser.parseProcessDefinitions(response.getText());
 		    view.update(definitions);
@@ -86,7 +85,7 @@ public class UpdateDefinitionsAction extends AbstractRESTAction
 		  }
 	  } else {
 		  Explorer view = (Explorer) controller.getView(Explorer.class.getName());
-		  if(view!=null) // may not be initialized (lazy)
+		  if(view != null) // may not be initialized (lazy)
 		  {      
 			  List<ProcessDefinitionRef> definitions =
 		            JSOParser.parseProcessDefinitions(response.getText());
