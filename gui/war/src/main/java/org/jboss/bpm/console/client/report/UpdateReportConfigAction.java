@@ -27,6 +27,7 @@ import com.mvc4g.client.Controller;
 import org.jboss.bpm.console.client.ApplicationContext;
 import org.jboss.bpm.console.client.common.AbstractRESTAction;
 import org.jboss.bpm.console.client.model.JSOParser;
+import org.jboss.bpm.console.client.util.ConsoleLog;
 import org.jboss.bpm.report.model.ReportReference;
 import org.jboss.errai.workspaces.client.framework.Registry;
 
@@ -74,5 +75,19 @@ public class UpdateReportConfigAction extends AbstractRESTAction
     List<ReportReference> reports = JSOParser.parseReportConfig(json);
     ReportView view = (ReportView)controller.getView(ReportView.ID);
     view.configure(reports);    
+  }
+  
+  @Override
+  public void handleError(String url, Throwable t) {
+	  final String out =
+			  "<b>Reporting Engine does not seem to be running. Please make sure it is running before creating reports.</b><br>" +
+			  "<b>Consult the jBPM Installer chapter in the documentation to learn how to set up the Reporting Engine.</b><br>" +
+			   "<ul>"+
+		       "<li>URL: '" + url + "'\n"+
+		       "<li>Action: '" + getId() + "'\n" +
+		       "<li>Exception: '" + t.getClass() +"'"+
+		       "</ul>\n\n";
+	  ConsoleLog.error(out, t);
+	  appContext.displayMessage(out, true);
   }
 }
