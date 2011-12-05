@@ -21,9 +21,11 @@
  */
 package org.jboss.bpm.console.server;
 
-import org.jboss.bpm.report.ReportFacade;
-
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+
+import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +38,7 @@ public class ConsoleServerApplication extends Application
 {
   HashSet<Object> singletons = new HashSet<Object>();
 
-  public ConsoleServerApplication()
+  public ConsoleServerApplication(@Context ServletContext servletContext)
   {
     singletons.add(new InfoFacade());
     singletons.add(new ProcessMgmtFacade());
@@ -45,8 +47,22 @@ public class ConsoleServerApplication extends Application
     singletons.add(new UserMgmtFacade());    
     singletons.add(new EngineFacade());
     singletons.add(new FormProcessingFacade());
-    singletons.add(new ReportFacade());
-    singletons.add(new ProcessHistoryFacade());
+    try {
+		@SuppressWarnings("rawtypes")
+		Class reportFacadeDefinition = Class
+				.forName("org.jboss.bpm.report.ReportFacade");
+		if (System.getProperty("reporting.needcontext") != null) {
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			Constructor reportFacadeConstructor = reportFacadeDefinition
+					.getConstructor(new Class[] { ServletContext.class });
+			singletons.add(reportFacadeConstructor.newInstance(servletContext));
+		} else {
+			singletons.add(reportFacadeDefinition.newInstance());
+		}
+	} catch (Exception e) {
+		System.out.println("Unable to load ReportFacade: " + e.getMessage());
+	}
+	singletons.add(new ProcessHistoryFacade());
   }
 
   @Override
