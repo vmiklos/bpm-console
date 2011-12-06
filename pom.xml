@@ -14,11 +14,11 @@
     </url>
 
     <scm>
-        <connection>scm:git:git@github.com:heiko-braun/bpm-console.git</connection>
-        <developerConnection>scm:git:git@github.com:heiko-braun/bpm-console.git</developerConnection>
-        <url>http://github.com/heiko-braun/bpm-console</url>
+        <connection>scm:git:git@github.com:bpmc/bpm-console.git</connection>
+        <developerConnection>scm:git:git@github.com:bpmc/bpm-console.git</developerConnection>
+        <url>https://github.com/bpmc/bpm-console</url>
     </scm>
-
+    
     <organization>
         <name>JBoss, a division of Red Hat</name>
         <url>http://www.jboss.org</url>
