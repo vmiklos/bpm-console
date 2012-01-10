@@ -12,12 +12,6 @@ public class RsDocGenerator {
 
     private File output;
 
-    private String projectName;
-
-    private static final String contextPath = "/gwt-console-server/rs";
-
-    private RsDocBuilder builder;
-
     public RsDocGenerator(String outputDir) throws Exception {
        try {
             this.output = new File(outputDir);
@@ -28,11 +22,13 @@ public class RsDocGenerator {
             throw new RuntimeException(e);
         }
 
-        this.builder = new RsDocBuilder(contextPath, InfoFacade.getRSResources());
     }
 
 
-    public void generate(String project, String type) {
+    public void generate(String contextPath, String project, String type) {
+
+        RsDocBuilder builder = new RsDocBuilder(contextPath, InfoFacade.getRSResources());
+
         String filename = this.output.getAbsolutePath() + "/" + project + "_restful_service." + type;
 
         String result = null;
@@ -68,11 +64,11 @@ public class RsDocGenerator {
       String dir = args[0];
 
       RsDocGenerator generator = new RsDocGenerator(dir);
-      generator.generate("riftsaw", "html");
-      generator.generate("riftsaw", "xml");
+      generator.generate("/bpel-console-server/rs", "riftsaw", "html");
+      generator.generate("/bpel-console-server/rs", "riftsaw", "xml");
 
-      generator.generate("jbpm", "html");
-      generator.generate("jbpm", "xml");
+      generator.generate("/gwt-console-server/rs", "jbpm", "html");
+      generator.generate("/gwt-console-server/rs", "jbpm", "xml");
     }
 
 }
